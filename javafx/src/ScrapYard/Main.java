@@ -33,6 +33,7 @@ public class Main extends Application {
     private boolean rechts;
 
     Magneet magneet;
+    Doos opgepakteDoos;
     ArrayList<Doos> dozen;
 
     private Scene scene1;
@@ -97,17 +98,39 @@ public class Main extends Application {
             magneet.setY(START_HOOGTE);
             magneetBinnenHalen = false;
 
-        } else if (magneet.getY() > HEIGHT-magneet.getHeight()) { // collision onderrand
-            magneet.setY(HEIGHT-magneet.getHeight());
-            magneetBinnenHalen();
+        } else if (opgepakteDoos == null) {
+            if (magneet.getY() > HEIGHT-magneet.getHeight()) { // collision onderrand
+                magneet.setY(HEIGHT - magneet.getHeight());
+                magneetBinnenHalen();
+            }
+        } else {
+            if (magneet.getY() > HEIGHT-magneet.getHeight()-opgepakteDoos.getHeight()) { // collision onderrand
+                magneet.setY(HEIGHT - magneet.getHeight()-opgepakteDoos.getHeight());
+                magneetBinnenHalen();
+            }
         }
 
-
+        int i = 0;
+        int pakDezeDoos = -1;
         for (Doos d : dozen) {
             d.updatePos(WIDTH, HEIGHT);
-            if (d.intersects(magneet)) {
-                System.out.println("doos raakt magneet!");
+            if (magneet.isAan() && d.intersects(magneet)) {
+                pakDezeDoos = i;
             }
+
+            // moet onderaan blijven staan
+            i++;
+        }
+        if (pakDezeDoos != -1) {
+            opgepakteDoos = dozen.get(pakDezeDoos);
+            opgepakteDoos.setXMotion(0);
+            opgepakteDoos.setYMotion(0);
+            dozen.remove(pakDezeDoos);
+        }
+
+        if (opgepakteDoos != null) {
+            opgepakteDoos.setX(magneet.getX() + magneet.getWidth() / 2 - opgepakteDoos.getWidth()/2);
+            opgepakteDoos.setY(magneet.getY() + magneet.getHeight());
         }
 
 
@@ -119,8 +142,16 @@ public class Main extends Application {
             magneet.setXMotion(Math.min(magneet.getXMotion() + 0.05, MAX_X_SPEED));
         }
         if (knop_B && magneetMagVeranderen) {
-            magneet.setAan(!magneet.isAan()); // switch magneet status;
             magneetMagVeranderen = false;
+
+            if (magneet.isAan() && opgepakteDoos != null) {  // wanneer je een object laat vallen
+                opgepakteDoos.setXMotion(magneet.getXMotion());
+                opgepakteDoos.setYMotion(magneet.getYMotion());
+                dozen.add(opgepakteDoos);
+                opgepakteDoos = null;
+            }
+
+            magneet.setAan(!magneet.isAan()); // switch magneet status;
         }
         if (knop_A && !magneetBinnenHalen) { // omlaag zolang A is ingedrukt
             magneet.setYMotion(Y_DOWN_SPEED);
@@ -134,13 +165,15 @@ public class Main extends Application {
         gc.setFill(Color.WHITE);
         gc.fillRect(0, 0, WIDTH, HEIGHT);
 
-        // ketting
-        gc.setFill(Color.GRAY);
-        gc.fillRect(magneet.getX()+magneet.getWidth()/2-5, 0, 10, magneet.getY());
+        if (opgepakteDoos != null) opgepakteDoos.draw(gc);
 
         for (Doos d : dozen) {
             d.draw(gc);
         }
+
+        // ketting
+        gc.setFill(Color.GRAY);
+        gc.fillRect(magneet.getX()+magneet.getWidth()/2-5, 0, 10, magneet.getY());
         magneet.draw(gc);
     }
 

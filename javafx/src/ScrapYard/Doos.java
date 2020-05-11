@@ -7,6 +7,7 @@ public class Doos extends Hitbox {
 
     private static double zwaartekracht = 0.05;
     private static double maxValSnelheid = 8;
+    private static double wrijvingsWeerstand = 0.05;
 
     private double xMotion;
     private double yMotion;
@@ -18,6 +19,14 @@ public class Doos extends Hitbox {
     public void draw(GraphicsContext gc) {
         gc.setFill(Color.BROWN);
         gc.fillRect(getX(), getY(), getWidth(), getHeight());
+    }
+
+    public void setXMotion(double xMotion) {
+        this.xMotion = xMotion;
+    }
+
+    public void setYMotion(double yMotion) {
+        this.yMotion = yMotion;
     }
 
     public void updatePos(double boundWidth, double boundHeight) {
@@ -40,9 +49,14 @@ public class Doos extends Hitbox {
             setY(0);
 
         } else if (getY() > boundHeight-getHeight()) { // collision onderrand
+
+            if (xMotion > 0) {
+                xMotion = Math.max(xMotion - wrijvingsWeerstand, 0);
+            } else {
+                xMotion = Math.min(xMotion + wrijvingsWeerstand, 0);
+            }
+            yMotion = 0;
             setY(boundHeight-getHeight());
         }
-        
-        
     }
 }
