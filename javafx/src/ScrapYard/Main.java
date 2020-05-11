@@ -1,10 +1,8 @@
-package MagnetGame;
+package ScrapYard;
 
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.application.Application;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
@@ -13,35 +11,29 @@ import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 
-import java.io.IOException;
-import java.util.Timer;
-import java.util.TimerTask;
+import java.util.ArrayList;
 
 public class Main extends Application {
 
-    private static final int WIDTH = 600;
-    private static final int HEIGHT = 700;
-    private static final int MAGNEET_WIDTH = 100;
-    private static final int MAGNEET_HALF_WIDTH = MAGNEET_WIDTH/2;
-    private static final int MAGNEET_HEIGHT = 20;
+    private static final double WIDTH = 600;
+    private static final double HEIGHT = 700;
 
     private static final double MAX_X_SPEED = 2;
     private static final double Y_UP_SPEED = 5;
     private static final double Y_DOWN_SPEED = 2;
     private static final double START_HOOGTE = 30;
-    private double magneetX = WIDTH/2.0;
-    private double magneetY = START_HOOGTE;
-    private double magneetXmotion = 0;
-    private double magneetYmotion = 0;
-    private boolean magneetAan;
+
     private boolean magneetMagVeranderen = true;
-    private boolean magneet_ophalen;
+    private boolean magneetBinnenHalen;
 
     // controls
     private boolean knop_B;
     private boolean knop_A;
     private boolean links;
     private boolean rechts;
+
+    Magneet magneet;
+    ArrayList<Doos> dozen;
 
     private Scene scene1;
 
@@ -51,12 +43,23 @@ public class Main extends Application {
 //        Parent root = FXMLLoader.load(getClass().getResource("sample.fxml"));
 //        primaryStage.setScene(new Scene(root, 300, 275));
 
-        primaryStage.setTitle("MagnetGame");
+        primaryStage.setTitle("ScrapYard");
         primaryStage.setResizable(false);
 
         Canvas canvas = new Canvas(WIDTH, HEIGHT);
         scene1 = new Scene(new StackPane(canvas));
         GraphicsContext gc = canvas.getGraphicsContext2D();
+
+        // startinstellingen voor scherminhoud
+        dozen = new ArrayList<>();
+        dozen.add(new Doos(100, -100, 100, 100));
+
+        magneet = new Magneet(WIDTH/2, START_HOOGTE);
+
+
+
+
+
 
 
         // start de timeline
@@ -76,43 +79,51 @@ public class Main extends Application {
     }
 
     private void gamelogic() {
-        // magneet links / rechts
-        magneetX += magneetXmotion;
-        if (magneetX > WIDTH-MAGNEET_HALF_WIDTH) { // collision rechterrand
-            magneetX = WIDTH-MAGNEET_HALF_WIDTH;
-            magneetXmotion = 0;
 
-        } else if (magneetX < MAGNEET_HALF_WIDTH) { // collision linkerrand
-            magneetX = MAGNEET_HALF_WIDTH;
-            magneetXmotion = 0;
+        magneet.updatePos();
+
+        if (magneet.getX() + magneet.getWidth() > WIDTH) { // collision rechterrand
+            magneet.setX(WIDTH - magneet.getWidth());
+            magneet.setXMotion(0);
+
+        } else if (magneet.getX() < 0) { // collision linkerrand
+            magneet.setX(0);
+            magneet.setXMotion(0);
         }
 
         // magneet omhoog / omlaag
-        magneetY += magneetYmotion;
-        if (magneetY < START_HOOGTE) { // collision bovenrand
-            magneetYmotion = 0;
-            magneetY = START_HOOGTE;
-            magneet_ophalen = false;
+        if (magneet.getY() < START_HOOGTE) { // collision bovenrand
+            magneet.setYMotion(0);
+            magneet.setY(START_HOOGTE);
+            magneetBinnenHalen = false;
 
-        } else if (magneetY > HEIGHT-MAGNEET_HEIGHT) { // collision onderrand
-            magneetY = HEIGHT-MAGNEET_HEIGHT;
-            magneetYmotion = -Y_UP_SPEED;
-            magneet_ophalen = true;
+        } else if (magneet.getY() > HEIGHT-magneet.getHeight()) { // collision onderrand
+            magneet.setY(HEIGHT-magneet.getHeight());
+            magneetBinnenHalen();
         }
+
+
+        for (Doos d : dozen) {
+            d.updatePos(WIDTH, HEIGHT);
+            if (d.intersects(magneet)) {
+                System.out.println("doos raakt magneet!");
+            }
+        }
+
 
         // acties per toets
         if (links) {
-            magneetXmotion = Math.max(magneetXmotion - 0.05, -MAX_X_SPEED);
+            magneet.setXMotion(Math.max(magneet.getXMotion() - 0.05, -MAX_X_SPEED));
         }
         if (rechts) {
-            magneetXmotion = Math.min(magneetXmotion + 0.05, MAX_X_SPEED);
+            magneet.setXMotion(Math.min(magneet.getXMotion() + 0.05, MAX_X_SPEED));
         }
         if (knop_B && magneetMagVeranderen) {
-            magneetAan = !magneetAan; // switch magneet status;
+            magneet.setAan(!magneet.isAan()); // switch magneet status;
             magneetMagVeranderen = false;
         }
-        if (knop_A && !magneet_ophalen) { // omlaag zolang A is ingedrukt
-            magneetYmotion = Y_DOWN_SPEED;
+        if (knop_A && !magneetBinnenHalen) { // omlaag zolang A is ingedrukt
+            magneet.setYMotion(Y_DOWN_SPEED);
         }
 
     }
@@ -125,16 +136,12 @@ public class Main extends Application {
 
         // ketting
         gc.setFill(Color.GRAY);
-        gc.fillRect(magneetX-5, 0, 10, magneetY);
+        gc.fillRect(magneet.getX()+magneet.getWidth()/2-5, 0, 10, magneet.getY());
 
-        // magneet
-        if (magneetAan) {
-            gc.setFill(Color.RED);
-            gc.fillRect(magneetX-MAGNEET_HALF_WIDTH, magneetY+3, MAGNEET_WIDTH, MAGNEET_HEIGHT);
+        for (Doos d : dozen) {
+            d.draw(gc);
         }
-        gc.setFill(Color.DARKGRAY);
-        gc.fillRect(magneetX-MAGNEET_HALF_WIDTH, magneetY, MAGNEET_WIDTH, MAGNEET_HEIGHT);
-
+        magneet.draw(gc);
     }
 
     private void drukToetsIn(int toets) {
@@ -169,10 +176,14 @@ public class Main extends Application {
                 break;
             case 83: // s
                 knop_A = false;
-                magneet_ophalen = true;
-                magneetYmotion = -Y_UP_SPEED;
+                magneetBinnenHalen();
                 break;
         }
+    }
+
+    private void magneetBinnenHalen() {
+        magneetBinnenHalen = true;
+        magneet.setYMotion(-Y_UP_SPEED);
     }
 
     public static void main(String[] args) {
