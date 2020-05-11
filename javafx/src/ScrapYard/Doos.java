@@ -43,6 +43,13 @@ public class Doos extends Hitbox {
             setY(boundHeight-getHeight());
         }
         
-        
+    }
+    public void setXMotion(double xMotion) {
+        this.xMotion = xMotion;
+    }
+
+    public void setYMotion(double yMotion) {
+        this.yMotion = yMotion;
     }
 }
+

@@ -3,11 +3,15 @@ package ScrapYard;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.application.Application;
+import javafx.event.EventHandler;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
+import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 
@@ -25,6 +29,7 @@ public class Main extends Application {
 
     private boolean magneetMagVeranderen = true;
     private boolean magneetBinnenHalen;
+    private boolean victory = false;
 
     // controls
     private boolean knop_B;
@@ -36,6 +41,10 @@ public class Main extends Application {
     ArrayList<Doos> dozen;
 
     private Scene scene1;
+    private StackPane pane;
+
+    private Text text = new Text();
+
 
     @Override
     public void start(Stage primaryStage) throws Exception{
@@ -47,15 +56,26 @@ public class Main extends Application {
         primaryStage.setResizable(false);
 
         Canvas canvas = new Canvas(WIDTH, HEIGHT);
-        scene1 = new Scene(new StackPane(canvas));
+        pane = new StackPane(canvas);
+        scene1 = new Scene(pane);
         GraphicsContext gc = canvas.getGraphicsContext2D();
+        pane.getChildren().add(text);
+        EventHandler<MouseEvent> eventHandler = new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent mouseEvent) {
+                cleanUp();
+                victory = false;
+                text.setText("");
+                System.out.println("clicked");
+            }
+        };
+        text.addEventHandler(MouseEvent.MOUSE_CLICKED, eventHandler);
 
         // startinstellingen voor scherminhoud
         dozen = new ArrayList<>();
         dozen.add(new Doos(100, -100, 100, 100));
 
         magneet = new Magneet(WIDTH/2, START_HOOGTE);
-
 
 
 
@@ -105,8 +125,17 @@ public class Main extends Application {
 
         for (Doos d : dozen) {
             d.updatePos(WIDTH, HEIGHT);
+            if (d.getY()>550 && d.getX() > 420){
+                victory = true;
+
+            }
             if (d.intersects(magneet)) {
                 System.out.println("doos raakt magneet!");
+                if (magneet.getYMotion() > 0) {
+                    magneet.setYMotion(0);
+                }
+                d.setXMotion(magneet.getXMotion());
+                d.setYMotion(magneet.getYMotion());
             }
         }
 
@@ -129,19 +158,33 @@ public class Main extends Application {
     }
 
     private void draw(GraphicsContext gc) {
+        if(victory){
+            gc.setFill(Color.BLACK);
+            gc.fillRect(0, 0, WIDTH, HEIGHT);
+            text.setFill(Color.GREEN);
+            text.setFont(new Font("Arial", 20));
+            text.setText("new game");
+            gc.setFill(Color.GREEN);
+            gc.setFont(new Font("Arial",50));
+            gc.fillText("Victory",250,300);
+        }else {
+            // achtergrond
+            gc.setFill(Color.WHITE);
+            gc.fillRect(0, 0, WIDTH, HEIGHT);
+            // paaltje
+            gc.setFill(Color.RED);
+            gc.fillRect(420, 600, 30, 200);
 
-        // achtergrond
-        gc.setFill(Color.WHITE);
-        gc.fillRect(0, 0, WIDTH, HEIGHT);
 
-        // ketting
-        gc.setFill(Color.GRAY);
-        gc.fillRect(magneet.getX()+magneet.getWidth()/2-5, 0, 10, magneet.getY());
+            // ketting
+            gc.setFill(Color.GRAY);
+            gc.fillRect(magneet.getX() + magneet.getWidth() / 2 - 5, 0, 10, magneet.getY());
 
-        for (Doos d : dozen) {
-            d.draw(gc);
+            for (Doos d : dozen) {
+                d.draw(gc);
+            }
+            magneet.draw(gc);
         }
-        magneet.draw(gc);
     }
 
     private void drukToetsIn(int toets) {
@@ -185,8 +228,22 @@ public class Main extends Application {
         magneetBinnenHalen = true;
         magneet.setYMotion(-Y_UP_SPEED);
     }
+    private void cleanUp(){
+        magneet.setYMotion(0);
+        magneet.setXMotion(0);
+        magneet.setX(WIDTH/2);
+        magneet.setY(START_HOOGTE);
+        for (Doos d : dozen) {
+        d.setYMotion(0);
+        d.setXMotion(0);
+        d.setX(100);
+        d.setY(-100);
+        }
+
+    }
 
     public static void main(String[] args) {
         launch(args);
+
     }
 }
