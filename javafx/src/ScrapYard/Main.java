@@ -6,8 +6,11 @@ import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
+import javafx.scene.shape.Rectangle;
+import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 
@@ -22,9 +25,12 @@ public class Main extends Application {
     private static final double Y_UP_SPEED = 5;
     private static final double Y_DOWN_SPEED = 2;
     private static final double START_HOOGTE = 30;
+    private static final Rectangle BAK = new Rectangle(WIDTH-110, HEIGHT-110, 110, 110);
 
     private boolean magneetMagVeranderen = true;
     private boolean magneetBinnenHalen;
+    private boolean victory;
+    private boolean gepauzeerd;
 
     // controls
     private boolean knop_B;
@@ -37,6 +43,8 @@ public class Main extends Application {
     ArrayList<Doos> dozen;
 
     private Scene scene1;
+    private Pane pane;
+    private Text text;
 
     @Override
     public void start(Stage primaryStage) throws Exception{
@@ -82,6 +90,10 @@ public class Main extends Application {
     }
 
     private void gamelogic() {
+
+        if (dozen.size() == 0) victory = true;
+
+        if (victory || gepauzeerd) return;
 
         magneet.updatePos();
 
