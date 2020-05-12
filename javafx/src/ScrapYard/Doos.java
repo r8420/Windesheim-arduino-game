@@ -22,8 +22,6 @@ public class Doos extends Hitbox {
     }
 
     public void draw(GraphicsContext gc) {
-//        gc.setFill(Color.BROWN);
-//        gc.fillRect(getX(), getY(), getWidth(), getHeight());
         try {
             this.auto = new Image(new FileInputStream("images/autotje.png"));
         } catch (FileNotFoundException fnfe){
