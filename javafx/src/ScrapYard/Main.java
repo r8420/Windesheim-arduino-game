@@ -30,10 +30,13 @@ public class Main extends Application {
     private static final double START_HOOGTE = 30;
     private static final Rectangle BAK = new Rectangle(WIDTH-110, HEIGHT-110, 110, 110);
 
+    private Integer timer;
+
     private boolean magneetMagVeranderen = true;
     private boolean magneetBinnenHalen;
     private boolean victory;
     private boolean gepauzeerd;
+    private boolean gameover;
 
     // controls
     private boolean knop_B;
@@ -105,13 +108,21 @@ public class Main extends Application {
         magneet.setYMotion(0);
         magneet.setXMotion(0);
         magneet.setAan(false);
+        timer = 3000;
     }
 
     private void gamelogic() {
 
+
         if (dozen.size() == 0 && opgepakteDoos == null) victory = true;
 
-        if (victory || gepauzeerd) return;
+        if (victory || gepauzeerd || gameover) return;
+
+        if (timer <= 0){
+            gameover = true;
+        }else{
+            timer--;
+        }
 
         magneet.updatePos();
 
@@ -220,6 +231,10 @@ public class Main extends Application {
 
         gc.setFill(Color.DARKGRAY);
         gc.fillRect(BAK.getX(),BAK.getY(),BAK.getWidth(),BAK.getHeight());
+        gc.setFill(Color.BLACK);
+        gc.setFont(new Font("Arial", 20));
+        Integer seconds = timer / 100;
+        gc.fillText(seconds.toString(),0,20);
 
         if (victory) {
             gc.setFill(new Color(1, 1,1, 0.5));
@@ -230,6 +245,17 @@ public class Main extends Application {
             gc.setFill(Color.GREEN);
             gc.setFont(new Font("Arial",50));
             gc.fillText("Victory",WIDTH/2-75,300);
+        }
+
+        if(gameover){
+            gc.setFill(new Color(1, 1,1, 0.5));
+            gc.fillRect(0, 0, WIDTH, HEIGHT);
+            newgameText.setFill(Color.GREEN);
+            newgameText.setFont(new Font("Arial", 20));
+            newgameText.setText("(A) new game");
+            gc.setFill(Color.GREEN);
+            gc.setFont(new Font("Arial",50));
+            gc.fillText("Game Over",WIDTH/2-125,300);
         }
     }
 
