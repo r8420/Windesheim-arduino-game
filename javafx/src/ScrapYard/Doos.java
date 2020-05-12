@@ -1,7 +1,11 @@
 package ScrapYard;
 
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.image.Image;
 import javafx.scene.paint.Color;
+
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 
 public class Doos extends Hitbox {
 
@@ -11,14 +15,21 @@ public class Doos extends Hitbox {
 
     private double xMotion;
     private double yMotion;
+    private Image auto;
 
     public Doos(double x, double y, double width, double height) {
         super(x, y, width, height);
     }
 
     public void draw(GraphicsContext gc) {
-        gc.setFill(Color.BROWN);
-        gc.fillRect(getX(), getY(), getWidth(), getHeight());
+//        gc.setFill(Color.BROWN);
+//        gc.fillRect(getX(), getY(), getWidth(), getHeight());
+        try {
+            this.auto = new Image(new FileInputStream("images/autotje.png"));
+        } catch (FileNotFoundException fnfe){
+            System.out.println("Kon geen plaatjes vinden.");
+        }
+        gc.drawImage(auto,getX(),getY(),getWidth(),getHeight());
     }
 
     public void setXMotion(double xMotion) {
