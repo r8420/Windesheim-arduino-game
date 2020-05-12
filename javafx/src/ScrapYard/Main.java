@@ -47,7 +47,7 @@ public class Main extends Application {
 
     private Scene scene1;
     private Pane pane;
-    private Text text;
+    private Text newgameText;
 
     @Override
     public void start(Stage primaryStage) throws Exception{
@@ -58,25 +58,19 @@ public class Main extends Application {
         primaryStage.setTitle("ScrapYard");
         primaryStage.setResizable(false);
 
-//        Canvas canvas = new Canvas(WIDTH, HEIGHT);
-//        scene1 = new Scene(new StackPane(canvas));
-//        GraphicsContext gc = canvas.getGraphicsContext2D();
-
         Canvas canvas = new Canvas(WIDTH, HEIGHT);
         pane = new StackPane(canvas);
         scene1 = new Scene(pane);
+        newgameText = new Text();
         GraphicsContext gc = canvas.getGraphicsContext2D();
-        pane.getChildren().add(text);
-        EventHandler<MouseEvent> eventHandler = new EventHandler<MouseEvent>() {
-            @Override
-            public void handle(MouseEvent mouseEvent) {
-                resetLevel();
-                victory = false;
-                text.setText("");
-                System.out.println("clicked");
-            }
+        pane.getChildren().add(newgameText);
+        EventHandler<MouseEvent> eventHandler = mouseEvent -> {
+            resetLevel();
+            victory = false;
+            newgameText.setText("");
+            System.out.println("clicked");
         };
-        text.addEventHandler(MouseEvent.MOUSE_CLICKED, eventHandler);
+        newgameText.addEventHandler(MouseEvent.MOUSE_CLICKED, eventHandler);
 
         // startinstellingen voor scherminhoud
         dozen = new ArrayList<>();
@@ -102,17 +96,20 @@ public class Main extends Application {
 
     private void resetLevel() {
         dozen.clear();
-        dozen.add(new Doos(randomWaarde(0,WIDTH-100), -100, randomWaarde(25,100), randomWaarde(25,100)));
-        dozen.add(new Doos(randomWaarde(0,WIDTH-100), -100, randomWaarde(25,100), randomWaarde(25,100)));
-        dozen.add(new Doos(randomWaarde(0,WIDTH-100), -100, randomWaarde(25,100), randomWaarde(25,100)));
+        dozen.add(new Doos(randomWaarde(0,WIDTH-200), HEIGHT/2, randomWaarde(25,100), randomWaarde(25,100)));
+//        dozen.add(new Doos(randomWaarde(0,WIDTH-200), HEIGHT/2, randomWaarde(25,100), randomWaarde(25,100)));
+//        dozen.add(new Doos(randomWaarde(0,WIDTH-200), HEIGHT/2, randomWaarde(25,100), randomWaarde(25,100)));
 
-        magneet.setX(WIDTH/2);
+        magneet.setX(WIDTH/2-magneet.getWidth()/2);
         magneet.setY(START_HOOGTE);
+        magneet.setYMotion(0);
+        magneet.setXMotion(0);
+        magneet.setAan(false);
     }
 
     private void gamelogic() {
 
-        if (dozen.size() == 0) victory = true;
+        if (dozen.size() == 0 && opgepakteDoos == null) victory = true;
 
         if (victory || gepauzeerd) return;
 
@@ -206,18 +203,6 @@ public class Main extends Application {
 
     private void draw(GraphicsContext gc) {
 
-        if (victory) {
-            gc.setFill(Color.BLACK);
-            gc.fillRect(0, 0, WIDTH, HEIGHT);
-            text.setFill(Color.GREEN);
-            text.setFont(new Font("Arial", 20));
-            text.setText("new game");
-            gc.setFill(Color.GREEN);
-            gc.setFont(new Font("Arial",50));
-            gc.fillText("Victory",250,300);
-            return;
-        }
-
         // achtergrond
         gc.setFill(Color.WHITE);
         gc.fillRect(0, 0, WIDTH, HEIGHT);
@@ -234,6 +219,17 @@ public class Main extends Application {
         magneet.draw(gc);
         gc.setFill(Color.DARKGRAY);
         gc.fillRect(WIDTH-110,HEIGHT-110,110,110);
+
+        if (victory) {
+            gc.setFill(new Color(1, 1,1, 0.5));
+            gc.fillRect(0, 0, WIDTH, HEIGHT);
+            newgameText.setFill(Color.GREEN);
+            newgameText.setFont(new Font("Arial", 20));
+            newgameText.setText("(A) new game");
+            gc.setFill(Color.GREEN);
+            gc.setFont(new Font("Arial",50));
+            gc.fillText("Victory",WIDTH/2-75,300);
+        }
     }
 
     private void drukToetsIn(int toets) {
