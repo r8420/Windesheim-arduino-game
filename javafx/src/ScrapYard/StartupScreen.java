@@ -1,21 +1,23 @@
 package ScrapYard;
 
 import javafx.animation.KeyFrame;
-import javafx.animation.ScaleTransition;
+
 import javafx.animation.Timeline;
 import javafx.application.Application;
 
-import static javafx.application.Application.launch;
 
 import javafx.event.EventHandler;
-import javafx.geometry.VPos;
+
 import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
 import javafx.scene.input.MouseEvent;
+
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
+import javafx.scene.layout.VBox;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 import javafx.scene.paint.Color;
@@ -28,7 +30,7 @@ import javafx.util.Duration;
 
 import java.awt.*;
 import java.io.File;
-import java.util.ArrayList;
+
 
 public class StartupScreen extends Application {
     // globale variable
@@ -36,7 +38,12 @@ public class StartupScreen extends Application {
     private static final double HEIGHT = 700;
     private final static int STARTHOOGTE = 30;
     private static final Rectangle BAK = new Rectangle(WIDTH - 110, HEIGHT - 110, 110, 110);
-    private Text newgame = new Text("NEW GAME");
+    private Text newgame = new Text("Spelen");
+    private Text title = new Text("ScrapYard");
+    private Text naamSpeler = new Text("Naam:");
+    private javafx.scene.control.TextField textFieldNaamSpeler = new javafx.scene.control.TextField();
+    private Text highscore = new Text("Highscore");
+    private String naam;
     private MediaPlayer mediaPlayer;
     private Boolean doosRaaktMagneet = false;
     private Boolean loslaten = false;
@@ -50,7 +57,7 @@ public class StartupScreen extends Application {
     public void start(Stage stage) {
         // achtergrond muziekje
         try {
-            String musicFile = "/schoolprojecten/game/javafx/src/Music/backgroundMusic.mp3";     // For example
+            String musicFile = "src/Music/backgroundMusic.mp3";     // For example
             Media sound = new Media(new File(musicFile).toURI().toString());
             mediaPlayer = new MediaPlayer(sound);
             mediaPlayer.setAutoPlay(true);
@@ -62,13 +69,29 @@ public class StartupScreen extends Application {
         GraphicsContext gc = canvas.getGraphicsContext2D();
 
         magneet = new Magneet(WIDTH / 2, STARTHOOGTE);
-
+        //texten aanpassen
+        HBox hb = new HBox();
+        title.setFont(new Font("Arial",60));
         //Creating a Group object
         Group root = new Group();
         root.getChildren().add(canvas);
         root.getChildren().add(newgame);
+        root.getChildren().add(title);
+        root.getChildren().add(textFieldNaamSpeler);
+        root.getChildren().add(naamSpeler);
+        root.getChildren().add(highscore);
+        //positie texten
+        title.setX(160);
+        title.setY(200);
+        naamSpeler.setX(200);
+        naamSpeler.setY(300);
+        textFieldNaamSpeler.setLayoutX(200);
+        textFieldNaamSpeler.setLayoutY(310);
         newgame.setX(260);
         newgame.setY(350);
+        highscore.setX(200);
+        highscore.setY(500);
+
         // event handler knoppen
         EventHandler<MouseEvent> eventHandler = new EventHandler<MouseEvent>() {
             @Override
@@ -81,7 +104,7 @@ public class StartupScreen extends Application {
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
-                System.out.println("clicked");
+
             }
         };
         newgame.addEventHandler(MouseEvent.MOUSE_CLICKED, eventHandler);
@@ -94,7 +117,7 @@ public class StartupScreen extends Application {
         stage.setTitle("Start-up");
 
         //title bar icon
-        File file = new File("/schoolprojecten/game/javafx/images/magneet_uit.png");
+        File file = new File("images/magneet_uit.png");
         Image image = new Image(file.toURI().toString());
         stage.getIcons().add(image);
         //Adding scene to the stage
