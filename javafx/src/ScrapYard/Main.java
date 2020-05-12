@@ -286,19 +286,7 @@ public class Main extends Application {
         magneetBinnenHalen = true;
         magneet.setYMotion(-Y_UP_SPEED);
     }
-    private void cleanUp(){
-        magneet.setYMotion(0);
-        magneet.setXMotion(0);
-        magneet.setX(WIDTH/2);
-        magneet.setY(START_HOOGTE);
-        for (PhysicsObject d : dozen) {
-            d.setYMotion(0);
-            d.setXMotion(0);
-            d.setX(100);
-            d.setY(-100);
-        }
 
-    }
 
     private double randomWaarde(double min, double max){
         return (Math.random()*((max-min)+1))+min;
