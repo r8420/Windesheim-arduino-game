@@ -14,12 +14,16 @@ import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.StackPane;
+import javafx.scene.media.Media;
+import javafx.scene.media.MediaPlayer;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import javafx.util.Duration;
+
+import java.io.File;
 
 public class StartupScreen extends Application {
     private static final double WIDTH = 600;
@@ -28,10 +32,20 @@ public class StartupScreen extends Application {
     private Rectangle blokje =  new Rectangle();
     private int rotation;
     private int XasBlokje;
+    private MediaPlayer mediaPlayer;
 
 
     @Override
     public void start(Stage stage) {
+        try {
+            String musicFile = "/schoolprojecten/game/javafx/src/Music/backgroundMusic.mp3";     // For example
+            Media sound = new Media(new File(musicFile).toURI().toString());
+            mediaPlayer = new MediaPlayer(sound);
+            mediaPlayer.setAutoPlay(true);
+        }catch (Exception mediafout){
+            System.out.println("ging wat fout");
+        }
+
         Canvas canvas = new Canvas(WIDTH, HEIGHT);
         GraphicsContext gc = canvas.getGraphicsContext2D();
         //Drawing a Circle
