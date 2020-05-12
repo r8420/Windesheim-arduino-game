@@ -71,7 +71,6 @@ public class Main extends Application {
             resetLevel();
             victory = false;
             newgameText.setText("");
-            System.out.println("clicked");
         };
         newgameText.addEventHandler(MouseEvent.MOUSE_CLICKED, eventHandler);
 
