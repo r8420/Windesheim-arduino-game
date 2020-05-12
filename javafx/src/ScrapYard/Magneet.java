@@ -2,7 +2,11 @@ package ScrapYard;
 
 
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.image.Image;
 import javafx.scene.paint.Color;
+
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 
 public class Magneet extends Hitbox {
 
@@ -23,12 +27,18 @@ public class Magneet extends Hitbox {
     }
 
     public void draw(GraphicsContext gc) {
-        if (aan) {
+                if (aan) {
             gc.setFill(Color.RED);
             gc.fillRect(getX(), getY()+3, getWidth(), getHeight());
         }
         gc.setFill(Color.DARKGRAY);
-        gc.fillRect(getX(), getY(), getWidth(), getHeight());
+//        gc.fillRect(getX(), getY(), getWidth(), getHeight());
+        try {
+            Image image = new Image(new FileInputStream("src/Images/magnet.jpg"));
+            gc.drawImage(image, getX(),getY(),getWidth(),getHeight());
+        }catch (FileNotFoundException fnfe){
+            System.out.println("Geen plaatje");
+        }d
     }
 
     public void setXMotion(double xMotion) {
