@@ -42,8 +42,8 @@ public class Main extends Application {
     private boolean rechts;
 
     Magneet magneet;
-    Doos opgepakteDoos;
-    ArrayList<Doos> dozen;
+    PhysicsObject opgepakteDoos;
+    ArrayList<PhysicsObject> dozen;
 
     private Scene scene1;
     private Pane pane;
@@ -96,7 +96,7 @@ public class Main extends Application {
 
     private void resetLevel() {
         dozen.clear();
-        dozen.add(new Doos(randomWaarde(0,WIDTH-200), HEIGHT/2, randomWaarde(25,100), randomWaarde(25,100)));
+        dozen.add(new PhysicsObject(randomWaarde(0,WIDTH-200), HEIGHT/2, randomWaarde(25,100), randomWaarde(25,100)));
 //        dozen.add(new Doos(randomWaarde(0,WIDTH-200), HEIGHT/2, randomWaarde(25,100), randomWaarde(25,100)));
 //        dozen.add(new Doos(randomWaarde(0,WIDTH-200), HEIGHT/2, randomWaarde(25,100), randomWaarde(25,100)));
 
@@ -145,10 +145,10 @@ public class Main extends Application {
         int i = 0;
         int pakDezeDoos = -1;
         int doosInBak = -1;
-        for (Doos d : dozen) {
+        for (PhysicsObject d : dozen) {
             d.updatePos(WIDTH, HEIGHT);
 
-            if (d.intersects(BAK)) {
+            if (d.getX() > BAK.getX() && d.getY() > BAK.getY()) {
                 doosInBak = i;
             }
 
@@ -209,7 +209,7 @@ public class Main extends Application {
 
         if (opgepakteDoos != null) opgepakteDoos.draw(gc);
 
-        for (Doos d : dozen) {
+        for (PhysicsObject d : dozen) {
             d.draw(gc);
         }
 
@@ -217,8 +217,9 @@ public class Main extends Application {
         gc.setFill(Color.GRAY);
         gc.fillRect(magneet.getX()+magneet.getWidth()/2-5, 0, 10, magneet.getY());
         magneet.draw(gc);
+
         gc.setFill(Color.DARKGRAY);
-        gc.fillRect(WIDTH-110,HEIGHT-110,110,110);
+        gc.fillRect(BAK.getX(),BAK.getY(),BAK.getWidth(),BAK.getHeight());
 
         if (victory) {
             gc.setFill(new Color(1, 1,1, 0.5));

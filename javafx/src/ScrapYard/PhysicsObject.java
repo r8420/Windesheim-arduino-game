@@ -7,7 +7,7 @@ import javafx.scene.paint.Color;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 
-public class Doos extends Hitbox {
+public class PhysicsObject extends Hitbox {
 
     private static double zwaartekracht = 0.05;
     private static double maxValSnelheid = 8;
@@ -17,7 +17,7 @@ public class Doos extends Hitbox {
     private double yMotion;
     private Image auto;
 
-    public Doos(double x, double y, double width, double height) {
+    public PhysicsObject(double x, double y, double width, double height) {
         super(x, y, width, height);
     }
 
@@ -36,6 +36,14 @@ public class Doos extends Hitbox {
 
     public void setYMotion(double yMotion) {
         this.yMotion = yMotion;
+    }
+
+    public double getYMotion() {
+        return yMotion;
+    }
+
+    public double getXMotion() {
+        return xMotion;
     }
 
     public void updatePos(double boundWidth, double boundHeight) {
