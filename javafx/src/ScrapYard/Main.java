@@ -54,7 +54,7 @@ public class Main extends Application {
         // startinstellingen voor scherminhoud
         dozen = new ArrayList<>();
         dozen.add(new Doos(100, -100, 100, 100));
-        dozen.add(new Doos(300, -100, 100, 100));
+        dozen.add(new Doos(300, -100, 50, 60));
 
         magneet = new Magneet(WIDTH/2, START_HOOGTE);
 

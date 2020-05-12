@@ -37,11 +37,11 @@ public class Doos extends Hitbox {
 
         if (getX() + getWidth() > boundWidth) { // collision rechterrand
             setX(boundWidth - getWidth());
-            xMotion = 0;
+            xMotion = -xMotion/3;
 
         } else if (getX() < 0) { // collision linkerrand
             setX(0);
-            xMotion = 0;
+            xMotion = -xMotion/3;
         }
 
         if (getY() < 0) { // collision bovenrand
@@ -55,7 +55,7 @@ public class Doos extends Hitbox {
             } else {
                 xMotion = Math.min(xMotion + wrijvingsWeerstand, 0);
             }
-            yMotion = 0;
+            yMotion = -yMotion/5;
             setY(boundHeight-getHeight());
         }
     }
