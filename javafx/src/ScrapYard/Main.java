@@ -8,8 +8,12 @@ import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.input.MouseEvent;
+
+import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
+import javafx.scene.shape.Rectangle;
+
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
@@ -26,10 +30,13 @@ public class Main extends Application {
     private static final double Y_UP_SPEED = 5;
     private static final double Y_DOWN_SPEED = 2;
     private static final double START_HOOGTE = 30;
+    private static final Rectangle BAK = new Rectangle(WIDTH-110, HEIGHT-110, 110, 110);
 
     private boolean magneetMagVeranderen = true;
     private boolean magneetBinnenHalen;
-    private boolean victory = false;
+
+    private boolean victory;
+    private boolean gepauzeerd;
 
     // controls
     private boolean knop_B;
@@ -38,12 +45,13 @@ public class Main extends Application {
     private boolean rechts;
 
     Magneet magneet;
-    ArrayList<Doos> dozen;
+    PhysicsObject opgepakteDoos;
+    ArrayList<PhysicsObject> dozen;
 
     private Scene scene1;
-    private StackPane pane;
 
-    private Text text = new Text();
+    private Pane pane;
+    private Text newgameText;
 
 
     @Override
@@ -58,29 +66,25 @@ public class Main extends Application {
         Canvas canvas = new Canvas(WIDTH, HEIGHT);
         pane = new StackPane(canvas);
         scene1 = new Scene(pane);
+
+        newgameText = new Text();
         GraphicsContext gc = canvas.getGraphicsContext2D();
-        pane.getChildren().add(text);
-        EventHandler<MouseEvent> eventHandler = new EventHandler<MouseEvent>() {
-            @Override
-            public void handle(MouseEvent mouseEvent) {
-                cleanUp();
-                victory = false;
-                text.setText("");
-                System.out.println("clicked");
-            }
+        pane.getChildren().add(newgameText);
+        EventHandler<MouseEvent> eventHandler = mouseEvent -> {
+            resetLevel();
+            victory = false;
+            newgameText.setText("");
+            System.out.println("clicked");
         };
-        text.addEventHandler(MouseEvent.MOUSE_CLICKED, eventHandler);
+        newgameText.addEventHandler(MouseEvent.MOUSE_CLICKED, eventHandler);
+
 
         // startinstellingen voor scherminhoud
         dozen = new ArrayList<>();
-        dozen.add(new Doos(100, -100, 100, 100));
-
         magneet = new Magneet(WIDTH/2, START_HOOGTE);
 
 
-
-
-
+        resetLevel();
 
         // start de timeline
         Timeline tl = new Timeline(new KeyFrame(Duration.millis(10), e -> {
@@ -98,7 +102,24 @@ public class Main extends Application {
         primaryStage.show();
     }
 
+    private void resetLevel() {
+        dozen.clear();
+        dozen.add(new PhysicsObject(randomWaarde(0,WIDTH-200), HEIGHT/2, randomWaarde(25,100), randomWaarde(25,100)));
+//        dozen.add(new Doos(randomWaarde(0,WIDTH-200), HEIGHT/2, randomWaarde(25,100), randomWaarde(25,100)));
+//        dozen.add(new Doos(randomWaarde(0,WIDTH-200), HEIGHT/2, randomWaarde(25,100), randomWaarde(25,100)));
+
+        magneet.setX(WIDTH/2-magneet.getWidth()/2);
+        magneet.setY(START_HOOGTE);
+        magneet.setYMotion(0);
+        magneet.setXMotion(0);
+        magneet.setAan(false);
+    }
+
     private void gamelogic() {
+
+        if (dozen.size() == 0 && opgepakteDoos == null) victory = true;
+
+        if (victory || gepauzeerd) return;
 
         magneet.updatePos();
 
@@ -117,26 +138,51 @@ public class Main extends Application {
             magneet.setY(START_HOOGTE);
             magneetBinnenHalen = false;
 
-        } else if (magneet.getY() > HEIGHT-magneet.getHeight()) { // collision onderrand
-            magneet.setY(HEIGHT-magneet.getHeight());
-            magneetBinnenHalen();
+        } else if (opgepakteDoos == null) {
+            if (magneet.getY() > HEIGHT-magneet.getHeight()) { // collision onderrand
+                magneet.setY(HEIGHT - magneet.getHeight());
+                magneetBinnenHalen();
+            }
+        } else {
+            if (magneet.getY() > HEIGHT-magneet.getHeight()-opgepakteDoos.getHeight()) { // collision onderrand
+                magneet.setY(HEIGHT - magneet.getHeight()-opgepakteDoos.getHeight());
+                magneetBinnenHalen();
+            }
         }
 
-
-        for (Doos d : dozen) {
+        int i = 0;
+        int pakDezeDoos = -1;
+        int doosInBak = -1;
+        for (PhysicsObject d : dozen) {
             d.updatePos(WIDTH, HEIGHT);
-            if (d.getY()>550 && d.getX() > 420){
-                victory = true;
+
+
+            if (d.getX() > BAK.getX() && d.getY() > BAK.getY()) {
+                doosInBak = i;
+            }
+
+            if (magneet.isAan() && opgepakteDoos == null && d.intersects(magneet)) {
+                pakDezeDoos = i;
 
             }
-            if (d.intersects(magneet)) {
-                System.out.println("doos raakt magneet!");
-                if (magneet.getYMotion() > 0) {
-                    magneet.setYMotion(0);
-                }
-                d.setXMotion(magneet.getXMotion());
-                d.setYMotion(magneet.getYMotion());
-            }
+
+            // moet onderaan blijven staan
+            i++;
+        }
+
+        if (doosInBak != -1) dozen.remove(doosInBak);
+
+        if (pakDezeDoos != -1) {
+            magneetBinnenHalen = true;
+            opgepakteDoos = dozen.get(pakDezeDoos);
+            opgepakteDoos.setXMotion(0);
+            opgepakteDoos.setYMotion(0);
+            dozen.remove(pakDezeDoos);
+        }
+
+        if (opgepakteDoos != null) {
+            opgepakteDoos.setX(magneet.getX() + magneet.getWidth() / 2 - opgepakteDoos.getWidth()/2);
+            opgepakteDoos.setY(magneet.getY() + magneet.getHeight()*0.9);
         }
 
 
@@ -148,8 +194,16 @@ public class Main extends Application {
             magneet.setXMotion(Math.min(magneet.getXMotion() + 0.05, MAX_X_SPEED));
         }
         if (knop_B && magneetMagVeranderen) {
-            magneet.setAan(!magneet.isAan()); // switch magneet status;
             magneetMagVeranderen = false;
+
+            if (magneet.isAan() && opgepakteDoos != null) {  // wanneer je een object laat vallen
+                opgepakteDoos.setXMotion(magneet.getXMotion());
+                opgepakteDoos.setYMotion(magneet.getYMotion());
+                dozen.add(opgepakteDoos);
+                opgepakteDoos = null;
+            }
+
+            magneet.setAan(!magneet.isAan()); // switch magneet status;
         }
         if (knop_A && !magneetBinnenHalen) { // omlaag zolang A is ingedrukt
             magneet.setYMotion(Y_DOWN_SPEED);
@@ -158,32 +212,36 @@ public class Main extends Application {
     }
 
     private void draw(GraphicsContext gc) {
-        if(victory){
-            gc.setFill(Color.BLACK);
+
+
+        // achtergrond
+        gc.setFill(Color.WHITE);
+        gc.fillRect(0, 0, WIDTH, HEIGHT);
+
+        if (opgepakteDoos != null) opgepakteDoos.draw(gc);
+
+        for (PhysicsObject d : dozen) {
+            d.draw(gc);
+        }
+
+        // ketting
+        gc.setFill(Color.GRAY);
+        gc.fillRect(magneet.getX()+magneet.getWidth()/2-5, 0, 10, magneet.getY());
+        magneet.draw(gc);
+
+        gc.setFill(Color.DARKGRAY);
+        gc.fillRect(BAK.getX(),BAK.getY(),BAK.getWidth(),BAK.getHeight());
+
+        if (victory) {
+            gc.setFill(new Color(1, 1,1, 0.5));
             gc.fillRect(0, 0, WIDTH, HEIGHT);
-            text.setFill(Color.GREEN);
-            text.setFont(new Font("Arial", 20));
-            text.setText("new game");
+            newgameText.setFill(Color.GREEN);
+            newgameText.setFont(new Font("Arial", 20));
+            newgameText.setText("(A) new game");
             gc.setFill(Color.GREEN);
             gc.setFont(new Font("Arial",50));
-            gc.fillText("Victory",250,300);
-        }else {
-            // achtergrond
-            gc.setFill(Color.WHITE);
-            gc.fillRect(0, 0, WIDTH, HEIGHT);
-            // paaltje
-            gc.setFill(Color.RED);
-            gc.fillRect(420, 600, 30, 200);
+            gc.fillText("Victory",WIDTH/2-75,300);
 
-
-            // ketting
-            gc.setFill(Color.GRAY);
-            gc.fillRect(magneet.getX() + magneet.getWidth() / 2 - 5, 0, 10, magneet.getY());
-
-            for (Doos d : dozen) {
-                d.draw(gc);
-            }
-            magneet.draw(gc);
         }
     }
 
@@ -233,13 +291,17 @@ public class Main extends Application {
         magneet.setXMotion(0);
         magneet.setX(WIDTH/2);
         magneet.setY(START_HOOGTE);
-        for (Doos d : dozen) {
-        d.setYMotion(0);
-        d.setXMotion(0);
-        d.setX(100);
-        d.setY(-100);
+        for (PhysicsObject d : dozen) {
+            d.setYMotion(0);
+            d.setXMotion(0);
+            d.setX(100);
+            d.setY(-100);
         }
 
+    }
+
+    private double randomWaarde(double min, double max){
+        return (Math.random()*((max-min)+1))+min;
     }
 
     public static void main(String[] args) {

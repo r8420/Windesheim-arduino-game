@@ -12,9 +12,4 @@
       <entry name="!?*.clj" />
     </wildcardResourcePatterns>
   </component>
-  <component name="JavacSettings">
-    <option name="ADDITIONAL_OPTIONS_OVERRIDE">
-      <module name="javafx" options="--add-exports java.net.http/jdk.internal.net.http.common=ALL-UNNAMED" />
-    </option>
-  </component>
 </project>
