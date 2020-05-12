@@ -53,8 +53,9 @@ public class Main extends Application {
 
         // startinstellingen voor scherminhoud
         dozen = new ArrayList<>();
-        dozen.add(new Doos(100, -100, 100, 100));
-        dozen.add(new Doos(300, -100, 50, 60));
+        dozen.add(new Doos(randomWaarde(0,WIDTH-100), -100, randomWaarde(25,100), randomWaarde(25,100)));
+        dozen.add(new Doos(randomWaarde(0,WIDTH-100), -100, randomWaarde(25,100), randomWaarde(25,100)));
+        dozen.add(new Doos(randomWaarde(0,WIDTH-100), -100, randomWaarde(25,100), randomWaarde(25,100)));
 
         magneet = new Magneet(WIDTH/2, START_HOOGTE);
 
@@ -177,6 +178,8 @@ public class Main extends Application {
         gc.setFill(Color.GRAY);
         gc.fillRect(magneet.getX()+magneet.getWidth()/2-5, 0, 10, magneet.getY());
         magneet.draw(gc);
+        gc.setFill(Color.DARKGRAY);
+        gc.fillRect(WIDTH-110,HEIGHT-110,110,110);
     }
 
     private void drukToetsIn(int toets) {
@@ -219,6 +222,10 @@ public class Main extends Application {
     private void magneetBinnenHalen() {
         magneetBinnenHalen = true;
         magneet.setYMotion(-Y_UP_SPEED);
+    }
+
+    private double randomWaarde(double min, double max){
+        return (Math.random()*((max-min)+1))+min;
     }
 
     public static void main(String[] args) {
