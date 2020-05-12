@@ -132,7 +132,7 @@ public class Main extends Application {
 
         if (opgepakteDoos != null) {
             opgepakteDoos.setX(magneet.getX() + magneet.getWidth() / 2 - opgepakteDoos.getWidth()/2);
-            opgepakteDoos.setY(magneet.getY() + magneet.getHeight());
+            opgepakteDoos.setY(magneet.getY() + magneet.getHeight()*0.9);
         }
 
 

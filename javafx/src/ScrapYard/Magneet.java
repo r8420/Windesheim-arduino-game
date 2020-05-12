@@ -13,12 +13,20 @@ public class Magneet extends Hitbox {
     private double xMotion;
     private double yMotion;
     private boolean aan;
+    private Image aanPlaatje;
+    private Image uitPlaatje;
 
 
     public Magneet(double x, double y) {
         super(x, y, 100, 100);
         this.xMotion = 0;
         this.yMotion = 0;
+        try {
+            this.uitPlaatje = new Image(new FileInputStream("images/magneet_uit.png"));
+            this.aanPlaatje = new Image(new FileInputStream("images/magneet_aan.png"));
+        } catch (FileNotFoundException fnfe){
+            System.out.println("Kon geen plaatjes vinden.");
+        }
     }
 
     public void updatePos() {
@@ -27,18 +35,11 @@ public class Magneet extends Hitbox {
     }
 
     public void draw(GraphicsContext gc) {
-                if (aan) {
-            gc.setFill(Color.RED);
-            gc.fillRect(getX(), getY()+3, getWidth(), getHeight());
+        if (aan) {
+            gc.drawImage(aanPlaatje, getX(),getY(),getWidth(),getHeight());
+        } else {
+            gc.drawImage(uitPlaatje, getX(),getY(),getWidth(),getHeight());
         }
-        gc.setFill(Color.DARKGRAY);
-//        gc.fillRect(getX(), getY(), getWidth(), getHeight());
-        try {
-            Image image = new Image(new FileInputStream("src/Images/magnet.jpg"));
-            gc.drawImage(image, getX(),getY(),getWidth(),getHeight());
-        }catch (FileNotFoundException fnfe){
-            System.out.println("Geen plaatje");
-        }d
     }
 
     public void setXMotion(double xMotion) {
