@@ -3,13 +3,16 @@ package ScrapYard;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.application.Application;
+import javafx.event.EventHandler;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
+import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import javafx.util.Duration;
@@ -55,23 +58,31 @@ public class Main extends Application {
         primaryStage.setTitle("ScrapYard");
         primaryStage.setResizable(false);
 
+//        Canvas canvas = new Canvas(WIDTH, HEIGHT);
+//        scene1 = new Scene(new StackPane(canvas));
+//        GraphicsContext gc = canvas.getGraphicsContext2D();
+
         Canvas canvas = new Canvas(WIDTH, HEIGHT);
-        scene1 = new Scene(new StackPane(canvas));
+        pane = new StackPane(canvas);
+        scene1 = new Scene(pane);
         GraphicsContext gc = canvas.getGraphicsContext2D();
+        pane.getChildren().add(text);
+        EventHandler<MouseEvent> eventHandler = new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent mouseEvent) {
+                resetLevel();
+                victory = false;
+                text.setText("");
+                System.out.println("clicked");
+            }
+        };
+        text.addEventHandler(MouseEvent.MOUSE_CLICKED, eventHandler);
 
         // startinstellingen voor scherminhoud
         dozen = new ArrayList<>();
-        dozen.add(new Doos(randomWaarde(0,WIDTH-100), -100, randomWaarde(25,100), randomWaarde(25,100)));
-        dozen.add(new Doos(randomWaarde(0,WIDTH-100), -100, randomWaarde(25,100), randomWaarde(25,100)));
-        dozen.add(new Doos(randomWaarde(0,WIDTH-100), -100, randomWaarde(25,100), randomWaarde(25,100)));
-
         magneet = new Magneet(WIDTH/2, START_HOOGTE);
 
-
-
-
-
-
+        resetLevel();
 
         // start de timeline
         Timeline tl = new Timeline(new KeyFrame(Duration.millis(10), e -> {
@@ -87,6 +98,16 @@ public class Main extends Application {
 
         primaryStage.setScene(scene1);
         primaryStage.show();
+    }
+
+    private void resetLevel() {
+        dozen.clear();
+        dozen.add(new Doos(randomWaarde(0,WIDTH-100), -100, randomWaarde(25,100), randomWaarde(25,100)));
+        dozen.add(new Doos(randomWaarde(0,WIDTH-100), -100, randomWaarde(25,100), randomWaarde(25,100)));
+        dozen.add(new Doos(randomWaarde(0,WIDTH-100), -100, randomWaarde(25,100), randomWaarde(25,100)));
+
+        magneet.setX(WIDTH/2);
+        magneet.setY(START_HOOGTE);
     }
 
     private void gamelogic() {
@@ -126,8 +147,14 @@ public class Main extends Application {
 
         int i = 0;
         int pakDezeDoos = -1;
+        int doosInBak = -1;
         for (Doos d : dozen) {
             d.updatePos(WIDTH, HEIGHT);
+
+            if (d.intersects(BAK)) {
+                doosInBak = i;
+            }
+
             if (magneet.isAan() && opgepakteDoos == null && d.intersects(magneet)) {
                 pakDezeDoos = i;
             }
@@ -135,6 +162,9 @@ public class Main extends Application {
             // moet onderaan blijven staan
             i++;
         }
+
+        if (doosInBak != -1) dozen.remove(doosInBak);
+
         if (pakDezeDoos != -1) {
             magneetBinnenHalen = true;
             opgepakteDoos = dozen.get(pakDezeDoos);
@@ -175,6 +205,18 @@ public class Main extends Application {
     }
 
     private void draw(GraphicsContext gc) {
+
+        if (victory) {
+            gc.setFill(Color.BLACK);
+            gc.fillRect(0, 0, WIDTH, HEIGHT);
+            text.setFill(Color.GREEN);
+            text.setFont(new Font("Arial", 20));
+            text.setText("new game");
+            gc.setFill(Color.GREEN);
+            gc.setFont(new Font("Arial",50));
+            gc.fillText("Victory",250,300);
+            return;
+        }
 
         // achtergrond
         gc.setFill(Color.WHITE);

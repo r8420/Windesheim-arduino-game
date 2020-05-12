@@ -11,7 +11,7 @@ public class Hitbox extends Rectangle {
     }
 
 
-    public boolean intersects(Hitbox that) {
+    public boolean intersects(Rectangle that) {
         return this.intersects(
                 that.getX(),
                 that.getY(),
