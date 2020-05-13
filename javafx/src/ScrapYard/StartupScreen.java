@@ -33,7 +33,7 @@ import java.io.File;
 
 
 public class StartupScreen extends Application {
-    // globale variable
+
     private static final double WIDTH = 600;
     private static final double HEIGHT = 700;
     private final static int STARTHOOGTE = 30;
@@ -43,11 +43,11 @@ public class StartupScreen extends Application {
     private Text naamSpeler = new Text("Naam:");
     private javafx.scene.control.TextField textFieldNaamSpeler = new javafx.scene.control.TextField();
     private Text highscore = new Text("Highscore");
-    private String naam;
     private MediaPlayer mediaPlayer;
     private Boolean doosRaaktMagneet = false;
     private Boolean loslaten = false;
     private Boolean Begin = true;
+
     // magneet en doos
     Magneet magneet;
     PhysicsObject doos = new PhysicsObject(50, HEIGHT - 30, 80, 30);
@@ -55,13 +55,14 @@ public class StartupScreen extends Application {
 
     @Override
     public void start(Stage stage) {
+
         // achtergrond muziekje
         try {
-            String musicFile = "src/Music/backgroundMusic.mp3";     // For example
+            String musicFile = "src/Music/backgroundMusic.mp3";
             Media sound = new Media(new File(musicFile).toURI().toString());
             mediaPlayer = new MediaPlayer(sound);
             mediaPlayer.setAutoPlay(true);
-        }catch (Exception mediafout){
+        } catch (Exception mediafout) {
             System.out.println("ging wat fout");
         }
 
@@ -69,10 +70,11 @@ public class StartupScreen extends Application {
         GraphicsContext gc = canvas.getGraphicsContext2D();
 
         magneet = new Magneet(WIDTH / 2, STARTHOOGTE);
-        //texten aanpassen
-        HBox hb = new HBox();
-        title.setFont(new Font("Arial",60));
-        //Creating a Group object
+
+        // texten aanpassen
+        title.setFont(new Font("Arial", 60));
+
+        // Creating a Group object
         Group root = new Group();
         root.getChildren().add(canvas);
         root.getChildren().add(newgame);
@@ -80,7 +82,8 @@ public class StartupScreen extends Application {
         root.getChildren().add(textFieldNaamSpeler);
         root.getChildren().add(naamSpeler);
         root.getChildren().add(highscore);
-        //positie texten
+
+        // positie texten
         title.setX(160);
         title.setY(200);
         naamSpeler.setX(200);
@@ -93,19 +96,16 @@ public class StartupScreen extends Application {
         highscore.setY(500);
 
         // event handler knoppen
-        EventHandler<MouseEvent> eventHandler = new EventHandler<MouseEvent>() {
-            @Override
-            public void handle(MouseEvent mouseEvent) {
-                Main main = new Main();
-                try {
-                    mediaPlayer.stop();
-                    main.start(new Stage());
-                    stage.close();
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-
+        EventHandler<MouseEvent> eventHandler = mouseEvent -> {
+            Main main = new Main();
+            try {
+                mediaPlayer.stop();
+                main.start(new Stage());
+                stage.close();
+            } catch (Exception e) {
+                e.printStackTrace();
             }
+
         };
         newgame.addEventHandler(MouseEvent.MOUSE_CLICKED, eventHandler);
 
@@ -120,6 +120,7 @@ public class StartupScreen extends Application {
         File file = new File("images/magneet_uit.png");
         Image image = new Image(file.toURI().toString());
         stage.getIcons().add(image);
+
         //Adding scene to the stage
         stage.setScene(scene);
         Timeline tl = new Timeline(new KeyFrame(Duration.millis(10), e -> {
@@ -128,8 +129,7 @@ public class StartupScreen extends Application {
         tl.setCycleCount(Timeline.INDEFINITE);
         tl.play();
         draw(gc);
-        //Displaying the contents of the stage
-        stage.show();
+
         //Displaying the contents of the stage
         stage.show();
     }
@@ -139,6 +139,7 @@ public class StartupScreen extends Application {
         // achtergrond
         gc.setFill(Color.WHITE);
         gc.fillRect(0, 0, WIDTH, HEIGHT);
+
         //fase 1 van animatie
         if (Begin) {
             if (magneet.getX() > 40) {
@@ -150,7 +151,8 @@ public class StartupScreen extends Application {
                 doosRaaktMagneet = true;
                 Begin = false;
             }
-            // fase 2 van animatie
+
+        // fase 2 van animatie
         } else if (doosRaaktMagneet) {
             if (magneet.getY() < HEIGHT - 120 && magneet.getY() > 100) {
                 magneet.setY(magneet.getY() - 1);
@@ -162,30 +164,37 @@ public class StartupScreen extends Application {
             }
             doos.setX(magneet.getX() + 10);
             doos.setY(magneet.getY() + 95);
-        } // fase 3 van animatie
-        else if(loslaten) {
-        magneet.setAan(false);
-        doos.setY(doos.getY() + 1);
-    }
-        if (doos.getX()>500 && doos.getY()>600){
+
+        // fase 3 van animatie
+        } else if (loslaten) {
+            magneet.setAan(false);
+            doos.setY(doos.getY() + 1);
+        }
+
+        if (doos.getX() > 500 && doos.getY() > 600) {
             loslaten = false;
             Begin = true;
             resetLevel();
         }
+
         // doos
         doos.draw(gc);
-    // ketting
+
+        // ketting
         gc.setFill(Color.GRAY);
-        gc.fillRect(magneet.getX()+magneet.getWidth()/2-5,0,10,magneet.getY());
+        gc.fillRect(magneet.getX() + magneet.getWidth() / 2 - 5, 0, 10, magneet.getY());
+
         // magneet
         magneet.draw(gc);
+
         // eind bak
         gc.setFill(Color.DARKGRAY);
-        gc.fillRect(BAK.getX(),BAK.getY(),BAK.getWidth(),BAK.getHeight());
+        gc.fillRect(BAK.getX(), BAK.getY(), BAK.getWidth(), BAK.getHeight());
 
 
-}
-    // de magneet en doos weer op bein plek zetten
+    }
+
+    // de magneet en doos weer op begin plek zetten
     private void resetLevel() {
         doos.setX(40);
         doos.setY(HEIGHT - 30);
