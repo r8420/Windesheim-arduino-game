@@ -8,10 +8,12 @@ import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.input.MouseEvent;
+
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
+
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
@@ -34,6 +36,7 @@ public class Main extends Application {
 
     private boolean magneetMagVeranderen = true;
     private boolean magneetBinnenHalen;
+
     private boolean victory;
     private boolean gepauzeerd;
     private boolean gameover;
@@ -49,8 +52,10 @@ public class Main extends Application {
     ArrayList<PhysicsObject> dozen;
 
     private Scene scene1;
+
     private Pane pane;
     private Text newgameText;
+
 
     @Override
     public void start(Stage primaryStage) throws Exception {
@@ -64,6 +69,7 @@ public class Main extends Application {
         Canvas canvas = new Canvas(WIDTH, HEIGHT);
         pane = new StackPane(canvas);
         scene1 = new Scene(pane);
+
         newgameText = new Text();
         GraphicsContext gc = canvas.getGraphicsContext2D();
         pane.getChildren().add(newgameText);
@@ -75,9 +81,11 @@ public class Main extends Application {
         };
         newgameText.addEventHandler(MouseEvent.MOUSE_CLICKED, eventHandler);
 
+
         // startinstellingen voor scherminhoud
         dozen = new ArrayList<>();
         magneet = new Magneet(WIDTH / 2, START_HOOGTE);
+
 
         resetLevel();
 
@@ -158,12 +166,14 @@ public class Main extends Application {
         for (PhysicsObject d : dozen) {
             d.updatePos(WIDTH, HEIGHT);
 
+
             if (d.getX() > BAK.getX() && d.getY() > BAK.getY()) {
                 doosInBak = i;
             }
 
             if (magneet.isAan() && opgepakteDoos == null && d.intersects(magneet)) {
                 pakDezeDoos = i;
+
             }
 
             // moet onderaan blijven staan
@@ -213,6 +223,7 @@ public class Main extends Application {
 
     private void draw(GraphicsContext gc) {
 
+
         // achtergrond
         gc.setFill(Color.WHITE);
         gc.fillRect(0, 0, WIDTH, HEIGHT);
@@ -234,7 +245,7 @@ public class Main extends Application {
         gc.setFont(new Font("Arial", 20));
         int seconds = timer / 100;
         int centiseconds = timer % 100;
-        gc.fillText(seconds + "." + (centiseconds<10 ? "0" : "") + centiseconds, 0, 20);
+        gc.fillText(seconds + "." + (centiseconds < 10 ? "0" : "") + centiseconds, 0, 20);
 
         if (victory) {
             gc.setFill(new Color(1, 1, 1, 0.5));
@@ -307,5 +318,6 @@ public class Main extends Application {
 
     public static void main(String[] args) {
         launch(args);
+
     }
 }
