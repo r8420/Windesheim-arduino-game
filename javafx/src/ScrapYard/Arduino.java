@@ -28,12 +28,12 @@ public class Arduino {
 
             while (sp.getInputStream().available() > 0) {
                 System.out.println("bytes: "+sp.bytesAvailable());
-                byte[] bytes = sp.getInputStream().readNBytes(sp.bytesAvailable());
+                byte[] bytes = sp.getInputStream().readNBytes(1);
                 lezing = new String(bytes);
                 System.out.println(lezing);
-                int getal = Integer.parseInt(lezing.trim());
-                int firstDigit = Integer.parseInt(Integer.toString(getal).substring(0, 1));
-                System.out.println("eerste getal: " + firstDigit);
+//                int getal = Integer.parseInt(lezing.trim());
+//                int firstDigit = Integer.parseInt(Integer.toString(getal).substring(0, 1));
+//                System.out.println("eerste getal: " + firstDigit);
             }
         } catch (NullPointerException | IOException NE) {
             lezing = null;
@@ -45,9 +45,9 @@ public class Arduino {
         Arduino arduino = new Arduino();
         arduino.arduinoStart();
         while (true) {
-            if (sp.bytesAvailable() > 2) {
+
                 arduino.arduinoSensor();
-            }
+
         }
 
 

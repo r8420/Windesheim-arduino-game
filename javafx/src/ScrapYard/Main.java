@@ -314,41 +314,28 @@ public class Main extends Application {
         }
     }
     public void arduinoSensor() {
-        String lezing = null;
-        int seconddigit;
-        try {
 
+        try {
             while (sp.getInputStream().available() > 0) {
-                System.out.println("bytes: "+sp.bytesAvailable());
-                byte[] bytes = sp.getInputStream().readNBytes(sp.bytesAvailable());
-                lezing = new String(bytes);
-                System.out.println("lezing: " + lezing);
-                double getal = Double.parseDouble(lezing);
-                System.out.println("getal: " + getal);
-                int firstDigit = Integer.parseInt(Double.toString(getal).substring(0, 1));
-                if (getal > 10) {
-                    seconddigit = Integer.parseInt(Double.toString(getal).substring(1, 2));
-                }else {
-                    seconddigit = -1;
-                }
-                System.out.println("eerste getal: " + firstDigit);
-                System.out.println("tweede getal: " + seconddigit);
-                if (firstDigit == 3 && seconddigit == 0 ){
+                byte[] bytes = sp.getInputStream().readNBytes(1);
+                char lezing = (char)bytes[0];
+                if (lezing == 'B'){
                     knop_B = true;
                     break;
-                }else if (firstDigit == 4 && seconddigit == 0 ){
+                }else if (lezing == 'b' ){
                     knop_B = false;
                     magneetMagVeranderen = true;
                     break;
-                }else if (firstDigit == 5 && seconddigit == 0 ){
+                }else if (lezing == 'A'){
                     knop_A = true;
                     break;
-                }else if (firstDigit == 6 && seconddigit == 0 ){
+                }else if (lezing == 'a'){
                     knop_A = false;
                     magneetBinnenHalen();
                     break;
                 }else {
-                    magneet.setXMotion((getal-512)/512*2);
+                    int getal = lezing - 48;
+                    magneet.setXMotion((getal-4.5)/4.5*2);
                 }
             }
         } catch (NullPointerException | IOException NE ) {
