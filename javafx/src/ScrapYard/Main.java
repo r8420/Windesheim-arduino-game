@@ -8,6 +8,7 @@ import javafx.event.EventHandler;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.image.Image;
 import javafx.scene.input.MouseEvent;
 
 import javafx.scene.layout.Pane;
@@ -20,6 +21,7 @@ import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 
+import java.io.File;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.util.ArrayList;
@@ -70,6 +72,9 @@ public class Main extends Application {
         arduinoConnected = arduinoStart();
         primaryStage.setTitle("ScrapYard");
         primaryStage.setResizable(false);
+        File file = new File("images/magneet_uit.png");
+        Image image = new Image(file.toURI().toString());
+        primaryStage.getIcons().add(image);
 
         Canvas canvas = new Canvas(WIDTH, HEIGHT);
         pane = new StackPane(canvas);
