@@ -138,6 +138,7 @@ public class Main extends Application {
     }
 
     private void resetLevel() {
+        opgepakteDoos = null;
         dozen.clear();
         dozen.add(new PhysicsObject(randomWaarde(0, WIDTH - 200), HEIGHT / 2, randomWaarde(25, 100), randomWaarde(25, 100)));
 //        dozen.add(new Doos(randomWaarde(0,WIDTH-200), HEIGHT/2, randomWaarde(25,100), randomWaarde(25,100)));
@@ -164,6 +165,7 @@ public class Main extends Application {
                 startschermText.setText("");
             }
             if (arduinoSensor() == 'B'){
+                sp.closePort();
                 StartupScreen startupScreen =  new StartupScreen();
                 startupScreen.start(new Stage());
                 primaryStage.close();
@@ -422,9 +424,7 @@ public class Main extends Application {
                     return lezing;
                 }
             }
-        } catch (NullPointerException | IOException NE) {
-            System.out.println("ging wat fout");
-
+        } catch (NullPointerException | IOException ignored) {
         } catch (NumberFormatException NFE) {
             System.out.println("gemiste getal");
         }

@@ -7,6 +7,7 @@ import javafx.animation.Timeline;
 import javafx.application.Application;
 
 
+import javafx.application.Platform;
 import javafx.event.EventHandler;
 
 import javafx.scene.Group;
@@ -41,10 +42,8 @@ public class StartupScreen extends Application {
     private final static int STARTHOOGTE = 30;
     private static final Rectangle BAK = new Rectangle(WIDTH - 110, HEIGHT - 110, 110, 110);
     private Text newgame = new Text("Spelen");
+    private Text leaveGame = new Text("Leave game");
     private Text title = new Text("ScrapYard");
-    private Text naamSpeler = new Text("Naam:");
-    private javafx.scene.control.TextField textFieldNaamSpeler = new javafx.scene.control.TextField();
-    private Text highscore = new Text("Highscore");
     private MediaPlayer mediaPlayer;
     private Boolean doosRaaktMagneet = false;
     private Boolean loslaten = false;
@@ -65,7 +64,7 @@ public class StartupScreen extends Application {
     public void start(Stage stage) {
         this.stage = stage;
 
-        arduinoStart();
+        arduinoConnected = arduinoStart();
         // achtergrond muziekje
         try {
             String musicFile = "src/Music/backgroundMusic.mp3";
@@ -88,22 +87,18 @@ public class StartupScreen extends Application {
         Group root = new Group();
         root.getChildren().add(canvas);
         root.getChildren().add(newgame);
+        root.getChildren().add(leaveGame);
         root.getChildren().add(title);
-        root.getChildren().add(textFieldNaamSpeler);
-        root.getChildren().add(naamSpeler);
-        root.getChildren().add(highscore);
+
 
         // positie texten
         title.setX(160);
         title.setY(200);
-        naamSpeler.setX(200);
-        naamSpeler.setY(300);
-        textFieldNaamSpeler.setLayoutX(200);
-        textFieldNaamSpeler.setLayoutY(310);
         newgame.setX(260);
         newgame.setY(350);
-        highscore.setX(200);
-        highscore.setY(500);
+        leaveGame.setX(260);
+        leaveGame.setY(370);
+
 
         // event handler knoppen
         EventHandler<MouseEvent> eventHandler = mouseEvent -> {
@@ -117,7 +112,12 @@ public class StartupScreen extends Application {
             }
 
         };
+        EventHandler<MouseEvent> eventHandler2 = mouseEvent -> {
+            System.exit(0);
+
+        };
         newgame.addEventHandler(MouseEvent.MOUSE_CLICKED, eventHandler);
+        leaveGame.addEventHandler(MouseEvent.MOUSE_CLICKED, eventHandler2);
 
         //Creating a scene object
         Scene scene = new Scene(root, WIDTH, HEIGHT);
@@ -134,6 +134,7 @@ public class StartupScreen extends Application {
         //Adding scene to the stage
         stage.setScene(scene);
         Timeline tl = new Timeline(new KeyFrame(Duration.millis(10), e -> {
+            if (arduinoConnected) arduinoSensor();
             draw(gc);
         }));
         tl.setCycleCount(Timeline.INDEFINITE);
@@ -244,20 +245,23 @@ public class StartupScreen extends Application {
                 char lezing = (char) bytes[0];
                 if (lezing == 'A') {
                     try {
+                        sp.closePort();
                         Main main = new Main();
                         mediaPlayer.stop();
                         main.start(new Stage());
                         stage.close();
+
+
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
                 }
                 if (lezing == 'B'){
-                    stage.close();
+                    System.exit(0);
                 }
             }
-        } catch (NullPointerException | IOException NE) {
-            System.out.println("ging wat fout");
+        } catch (NullPointerException | IOException ignored) {
+
 
         } catch (NumberFormatException NFE) {
             System.out.println("gemiste getal");
