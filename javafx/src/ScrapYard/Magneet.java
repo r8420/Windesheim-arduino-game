@@ -3,7 +3,6 @@ package ScrapYard;
 
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
-import javafx.scene.paint.Color;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -24,7 +23,7 @@ public class Magneet extends Hitbox {
         try {
             this.uitPlaatje = new Image(new FileInputStream("images/magneet_uit.png"));
             this.aanPlaatje = new Image(new FileInputStream("images/magneet_aan.png"));
-        } catch (FileNotFoundException fnfe){
+        } catch (FileNotFoundException fnfe) {
             System.out.println("Kon geen plaatjes vinden.");
         }
     }
@@ -36,9 +35,9 @@ public class Magneet extends Hitbox {
 
     public void draw(GraphicsContext gc) {
         if (aan) {
-            gc.drawImage(aanPlaatje, getX(),getY(),getWidth(),getHeight());
+            gc.drawImage(aanPlaatje, getX(), getY(), getWidth(), getHeight());
         } else {
-            gc.drawImage(uitPlaatje, getX(),getY(),getWidth(),getHeight());
+            gc.drawImage(uitPlaatje, getX(), getY(), getWidth(), getHeight());
         }
     }
 

@@ -7,7 +7,6 @@ import javafx.animation.Timeline;
 import javafx.application.Application;
 
 
-import javafx.application.Platform;
 import javafx.event.EventHandler;
 
 import javafx.scene.Group;
@@ -17,20 +16,15 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
 import javafx.scene.input.MouseEvent;
 
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.StackPane;
-import javafx.scene.layout.VBox;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 import javafx.scene.paint.Color;
-import javafx.scene.shape.Circle;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 
-import java.awt.*;
 import java.io.File;
 import java.io.IOException;
 
@@ -112,10 +106,7 @@ public class StartupScreen extends Application {
             }
 
         };
-        EventHandler<MouseEvent> eventHandler2 = mouseEvent -> {
-            System.exit(0);
-
-        };
+        EventHandler<MouseEvent> eventHandler2 = mouseEvent -> System.exit(0);
         newgame.addEventHandler(MouseEvent.MOUSE_CLICKED, eventHandler);
         leaveGame.addEventHandler(MouseEvent.MOUSE_CLICKED, eventHandler2);
 
@@ -163,7 +154,7 @@ public class StartupScreen extends Application {
                 Begin = false;
             }
 
-        // fase 2 van animatie
+            // fase 2 van animatie
         } else if (doosRaaktMagneet) {
             if (magneet.getY() < HEIGHT - 120 && magneet.getY() > 100) {
                 magneet.setY(magneet.getY() - 1);
@@ -176,7 +167,7 @@ public class StartupScreen extends Application {
             doos.setX(magneet.getX() + 10);
             doos.setY(magneet.getY() + 95);
 
-        // fase 3 van animatie
+            // fase 3 van animatie
         } else if (loslaten) {
             magneet.setAan(false);
             doos.setY(doos.getY() + 1);
@@ -234,11 +225,9 @@ public class StartupScreen extends Application {
         }
     }
 
-    public char arduinoSensor() {
+    public void arduinoSensor() {
         // Tegen spam wanneer je gewonnen hebt (game over bent) zonder arduino
-        if (!arduinoConnected){
-            return 0;
-        }
+        if (!arduinoConnected) return;
         try {
             while (sp.getInputStream().available() > 0) {
                 byte[] bytes = sp.getInputStream().readNBytes(1);
@@ -256,7 +245,7 @@ public class StartupScreen extends Application {
                         e.printStackTrace();
                     }
                 }
-                if (lezing == 'B'){
+                if (lezing == 'B') {
                     System.exit(0);
                 }
             }
@@ -266,10 +255,9 @@ public class StartupScreen extends Application {
         } catch (NumberFormatException NFE) {
             System.out.println("gemiste getal");
         }
-        return 0;
     }
 
-    public static void main(String args[]) {
+    public static void main(String[] args) {
         launch(args);
     }
 }

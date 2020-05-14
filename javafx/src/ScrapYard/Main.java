@@ -12,9 +12,6 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
 import javafx.scene.input.MouseEvent;
 
-import javafx.scene.layout.FlowPane;
-import javafx.scene.layout.Pane;
-import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 
@@ -59,9 +56,6 @@ public class Main extends Application {
 
     private static SerialPort sp;
 
-    private Scene scene1;
-
-    private Group rootPane;
     private Text newgameText;
     private Text startschermText;
 
@@ -71,7 +65,7 @@ public class Main extends Application {
 
 
     @Override
-    public void start(Stage primaryStage) throws Exception {
+    public void start(Stage primaryStage) {
         this.primaryStage = primaryStage;
 //        Parent root = FXMLLoader.load(getClass().getResource("sample.fxml"));
 //        primaryStage.setScene(new Scene(root, 300, 275));
@@ -84,15 +78,15 @@ public class Main extends Application {
         primaryStage.getIcons().add(image);
 
         Canvas canvas = new Canvas(WIDTH, HEIGHT);
-        rootPane = new Group(canvas);
-        scene1 = new Scene(rootPane);
+        Group rootPane = new Group(canvas);
+        Scene scene1 = new Scene(rootPane);
 
         newgameText = new Text();
-        newgameText.setX(WIDTH/2-60);
+        newgameText.setX(WIDTH / 2 - 60);
         newgameText.setY(350);
         startschermText = new Text();
         startschermText.setY(375);
-        startschermText.setX(WIDTH/2-60);
+        startschermText.setX(WIDTH / 2 - 60);
 
         GraphicsContext gc = canvas.getGraphicsContext2D();
         rootPane.getChildren().addAll(newgameText, startschermText);
@@ -105,7 +99,7 @@ public class Main extends Application {
         };
 
         EventHandler<MouseEvent> eventHandler2 = mouseEvent -> {
-            StartupScreen startupScreen =  new StartupScreen();
+            StartupScreen startupScreen = new StartupScreen();
             startupScreen.start(new Stage());
             primaryStage.close();
         };
@@ -157,16 +151,16 @@ public class Main extends Application {
         if (dozen.size() == 0 && opgepakteDoos == null) victory = true;  // winconditie
 
         if (victory || gameover) {
-            if(arduinoSensor() == 'A'){
+            if (arduinoSensor() == 'A') {
                 resetLevel();
                 victory = false;
                 gameover = false;
                 newgameText.setText("");
                 startschermText.setText("");
             }
-            if (arduinoSensor() == 'B'){
+            if (arduinoSensor() == 'B') {
                 sp.closePort();
-                StartupScreen startupScreen =  new StartupScreen();
+                StartupScreen startupScreen = new StartupScreen();
                 startupScreen.start(new Stage());
                 primaryStage.close();
             }
@@ -397,7 +391,7 @@ public class Main extends Application {
 
     public char arduinoSensor() {
         // Tegen spam wanneer je gewonnen hebt (game over bent) zonder arduino
-        if (!arduinoConnected){
+        if (!arduinoConnected) {
             return 0;
         }
         try {
