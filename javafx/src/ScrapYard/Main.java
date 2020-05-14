@@ -1,5 +1,6 @@
 package ScrapYard;
 
+import com.fazecast.jSerialComm.SerialPort;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.application.Application;
@@ -7,6 +8,7 @@ import javafx.event.EventHandler;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.image.Image;
 import javafx.scene.input.MouseEvent;
 
 import javafx.scene.layout.Pane;
@@ -19,7 +21,11 @@ import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 
+import java.io.File;
+import java.io.IOException;
+import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 public class Main extends Application {
 
@@ -33,6 +39,7 @@ public class Main extends Application {
     private static final Rectangle BAK = new Rectangle(WIDTH - 110, HEIGHT - 110, 110, 110);
 
     private Integer timer;
+
 
     private boolean magneetMagVeranderen = true;
     private boolean magneetBinnenHalen;
@@ -50,11 +57,14 @@ public class Main extends Application {
     Magneet magneet;
     PhysicsObject opgepakteDoos;
     ArrayList<PhysicsObject> dozen;
+    private static SerialPort sp;
 
     private Scene scene1;
 
     private Pane pane;
     private Text newgameText;
+
+    private boolean arduinoConnected;
 
 
     @Override
@@ -63,8 +73,12 @@ public class Main extends Application {
 //        Parent root = FXMLLoader.load(getClass().getResource("sample.fxml"));
 //        primaryStage.setScene(new Scene(root, 300, 275));
 
+        arduinoConnected = arduinoStart();
         primaryStage.setTitle("ScrapYard");
         primaryStage.setResizable(false);
+        File file = new File("images/magneet_uit.png");
+        Image image = new Image(file.toURI().toString());
+        primaryStage.getIcons().add(image);
 
         Canvas canvas = new Canvas(WIDTH, HEIGHT);
         pane = new StackPane(canvas);
@@ -92,6 +106,7 @@ public class Main extends Application {
         // start de timeline
         Timeline tl = new Timeline(new KeyFrame(Duration.millis(10), e -> {
             gamelogic();
+            if (arduinoConnected) arduinoSensor();
             draw(gc);
         }));
         tl.setCycleCount(Timeline.INDEFINITE);
@@ -149,12 +164,16 @@ public class Main extends Application {
             magneetBinnenHalen = false;
 
         } else if (opgepakteDoos == null) {
+
             if (magneet.getY() > HEIGHT - magneet.getHeight()) {  // collision onderrand
+
                 magneet.setY(HEIGHT - magneet.getHeight());
                 magneetBinnenHalen();
             }
         } else {
+
             if (magneet.getY() > HEIGHT - magneet.getHeight() - opgepakteDoos.getHeight()) {  // collision onderrand
+
                 magneet.setY(HEIGHT - magneet.getHeight() - opgepakteDoos.getHeight());
                 magneetBinnenHalen();
             }
@@ -241,11 +260,13 @@ public class Main extends Application {
 
         gc.setFill(Color.DARKGRAY);
         gc.fillRect(BAK.getX(), BAK.getY(), BAK.getWidth(), BAK.getHeight());
+
         gc.setFill(Color.BLACK);
         gc.setFont(new Font("Arial", 20));
         int seconds = timer / 100;
         int centiseconds = timer % 100;
         gc.fillText(seconds + "." + (centiseconds < 10 ? "0" : "") + centiseconds, 0, 20);
+
 
         if (victory) {
             gc.setFill(new Color(1, 1, 1, 0.5));
@@ -256,7 +277,9 @@ public class Main extends Application {
             gc.setFill(Color.GREEN);
             gc.setFont(new Font("Arial", 50));
             gc.fillText("Victory", WIDTH / 2 - 75, 300);
+
         }
+
 
         if (gameover) {
             gc.setFill(new Color(1, 1, 1, 0.5));
@@ -312,9 +335,59 @@ public class Main extends Application {
         magneet.setYMotion(-Y_UP_SPEED);
     }
 
+
     private double randomWaarde(double min, double max) {
         return (Math.random() * ((max - min) + 1)) + min;
     }
+
+    public boolean arduinoStart() {
+        sp = SerialPort.getCommPort("COM3");
+        sp.setComPortParameters(9600, 8, 1, 0);
+        sp.setComPortTimeouts(SerialPort.TIMEOUT_NONBLOCKING, 0, 0);
+
+        if (sp.openPort()) {
+            System.out.println("Succesfully connected to Arduino");
+            return true;
+
+        } else {
+            System.out.println("Couldn't connect to Arduino");
+            return false;
+        }
+    }
+
+    public void arduinoSensor() {
+
+        try {
+            while (sp.getInputStream().available() > 0) {
+                byte[] bytes = sp.getInputStream().readNBytes(1);
+                char lezing = (char) bytes[0];
+                if (lezing == 'B') {
+                    knop_B = true;
+                    break;
+                } else if (lezing == 'b') {
+                    knop_B = false;
+                    magneetMagVeranderen = true;
+                    break;
+                } else if (lezing == 'A') {
+                    knop_A = true;
+                    break;
+                } else if (lezing == 'a') {
+                    knop_A = false;
+                    magneetBinnenHalen();
+                    break;
+                } else {
+                    int getal = lezing - 48;
+                    magneet.setXMotion((getal - 4.5) / 4.5 * 2);
+                }
+            }
+        } catch (NullPointerException | IOException NE) {
+            System.out.println("ging wat fout");
+
+        } catch (NumberFormatException NFE) {
+            System.out.println("gemiste getal");
+        }
+    }
+
 
     public static void main(String[] args) {
         launch(args);
