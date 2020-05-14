@@ -1,5 +1,6 @@
 package ScrapYard;
 
+import com.fazecast.jSerialComm.SerialPort;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.application.Application;
@@ -19,7 +20,10 @@ import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 
+import java.io.IOException;
+import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 public class Main extends Application {
 
@@ -47,11 +51,14 @@ public class Main extends Application {
     Magneet magneet;
     PhysicsObject opgepakteDoos;
     ArrayList<PhysicsObject> dozen;
+    private static SerialPort sp;
 
     private Scene scene1;
 
     private Pane pane;
     private Text newgameText;
+    private int huidigePotStand;
+    private Object BigInteger;
 
 
     @Override
@@ -59,7 +66,7 @@ public class Main extends Application {
 
 //        Parent root = FXMLLoader.load(getClass().getResource("sample.fxml"));
 //        primaryStage.setScene(new Scene(root, 300, 275));
-
+        arduinoStart();
         primaryStage.setTitle("ScrapYard");
         primaryStage.setResizable(false);
 
@@ -90,6 +97,7 @@ public class Main extends Application {
         Timeline tl = new Timeline(new KeyFrame(Duration.millis(10), e -> {
             gamelogic();
             draw(gc);
+            arduinoSensor();
         }));
         tl.setCycleCount(Timeline.INDEFINITE);
         tl.play();
@@ -291,6 +299,53 @@ public class Main extends Application {
     private double randomWaarde(double min, double max){
         return (Math.random()*((max-min)+1))+min;
     }
+    public boolean arduinoStart() throws InterruptedException {
+        sp = SerialPort.getCommPort("COM3");
+        sp.setComPortParameters(9600, 8, 1, 0);
+        sp.setComPortTimeouts(SerialPort.TIMEOUT_NONBLOCKING, 0, 0);
+
+        if (sp.openPort()) {
+            System.out.println("Succesfully connected to Arduino");
+            return true;
+
+        } else {
+            System.out.println("Couldn't connect to Arduino");
+            return false;
+        }
+    }
+    public void arduinoSensor() {
+
+        try {
+            while (sp.getInputStream().available() > 0) {
+                byte[] bytes = sp.getInputStream().readNBytes(1);
+                char lezing = (char)bytes[0];
+                if (lezing == 'B'){
+                    knop_B = true;
+                    break;
+                }else if (lezing == 'b' ){
+                    knop_B = false;
+                    magneetMagVeranderen = true;
+                    break;
+                }else if (lezing == 'A'){
+                    knop_A = true;
+                    break;
+                }else if (lezing == 'a'){
+                    knop_A = false;
+                    magneetBinnenHalen();
+                    break;
+                }else {
+                    int getal = lezing - 48;
+                    magneet.setXMotion((getal-4.5)/4.5*2);
+                }
+            }
+        } catch (NullPointerException | IOException NE ) {
+            System.out.println("ging wat fout");
+
+        }catch (NumberFormatException NFE){
+            System.out.println("gemiste getal");
+        }
+    }
+
 
     public static void main(String[] args) {
         launch(args);
