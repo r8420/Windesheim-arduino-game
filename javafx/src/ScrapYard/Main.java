@@ -56,6 +56,7 @@ public class Main extends Application {
     Magneet magneet;
     PhysicsObject opgepakteDoos;
     ArrayList<PhysicsObject> dozen;
+
     private static SerialPort sp;
 
     private Scene scene1;
@@ -63,6 +64,7 @@ public class Main extends Application {
     private Group rootPane;
     private Text newgameText;
     private Text startschermText;
+
 
     private boolean arduinoConnected;
     private Stage primaryStage;

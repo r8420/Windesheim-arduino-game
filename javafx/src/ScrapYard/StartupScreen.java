@@ -1,5 +1,6 @@
 package ScrapYard;
 
+import com.fazecast.jSerialComm.SerialPort;
 import javafx.animation.KeyFrame;
 
 import javafx.animation.Timeline;
@@ -30,6 +31,7 @@ import javafx.util.Duration;
 
 import java.awt.*;
 import java.io.File;
+import java.io.IOException;
 
 
 public class StartupScreen extends Application {
@@ -47,6 +49,12 @@ public class StartupScreen extends Application {
     private Boolean doosRaaktMagneet = false;
     private Boolean loslaten = false;
     private Boolean Begin = true;
+    private boolean knop_B;
+    private boolean knop_A;
+    private static SerialPort sp;
+    private boolean arduinoConnected;
+    private Stage stage;
+
 
     // magneet en doos
     Magneet magneet;
@@ -55,7 +63,9 @@ public class StartupScreen extends Application {
 
     @Override
     public void start(Stage stage) {
+        this.stage = stage;
 
+        arduinoStart();
         // achtergrond muziekje
         try {
             String musicFile = "src/Music/backgroundMusic.mp3";
@@ -205,6 +215,54 @@ public class StartupScreen extends Application {
         magneet.setYMotion(0);
         magneet.setXMotion(0);
         magneet.setAan(false);
+    }
+
+
+    public boolean arduinoStart() {
+        sp = SerialPort.getCommPort("COM3");
+        sp.setComPortParameters(9600, 8, 1, 0);
+        sp.setComPortTimeouts(SerialPort.TIMEOUT_NONBLOCKING, 0, 0);
+
+        if (sp.openPort()) {
+            System.out.println("Succesfully connected to Arduino");
+            return true;
+
+        } else {
+            System.out.println("Couldn't connect to Arduino");
+            return false;
+        }
+    }
+
+    public char arduinoSensor() {
+        // Tegen spam wanneer je gewonnen hebt (game over bent) zonder arduino
+        if (!arduinoConnected){
+            return 0;
+        }
+        try {
+            while (sp.getInputStream().available() > 0) {
+                byte[] bytes = sp.getInputStream().readNBytes(1);
+                char lezing = (char) bytes[0];
+                if (lezing == 'A') {
+                    try {
+                        Main main = new Main();
+                        mediaPlayer.stop();
+                        main.start(new Stage());
+                        stage.close();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+                if (lezing == 'B'){
+                    stage.close();
+                }
+            }
+        } catch (NullPointerException | IOException NE) {
+            System.out.println("ging wat fout");
+
+        } catch (NumberFormatException NFE) {
+            System.out.println("gemiste getal");
+        }
+        return 0;
     }
 
     public static void main(String args[]) {
