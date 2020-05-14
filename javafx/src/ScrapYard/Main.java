@@ -99,8 +99,7 @@ public class Main extends Application {
         };
 
         EventHandler<MouseEvent> eventHandler2 = mouseEvent -> {
-            StartupScreen startupScreen = new StartupScreen();
-            StartupScreen.startStartupScherm();
+            StartupScreen.showStartupScherm();
             primaryStage.close();
         };
         newgameText.addEventHandler(MouseEvent.MOUSE_CLICKED, eventHandler);
@@ -148,22 +147,24 @@ public class Main extends Application {
 
     private void gamelogic() {
 
+        arduinoSensor();
+
         if (dozen.size() == 0 && opgepakteDoos == null) victory = true;  // winconditie
 
         if (victory || gameover) {
-            if (arduinoSensor() == 'A') {
+            if (knop_A) {
                 resetLevel();
                 victory = false;
                 gameover = false;
                 newgameText.setText("");
                 startschermText.setText("");
             }
-            if (arduinoSensor() == 'B') {
+            if (knop_B) {
+                knop_B = false;
                 sp.closePort();
-                StartupScreen.startStartupScherm();
+                StartupScreen.showStartupScherm();
                 primaryStage.close();
             }
-
             return;
         }
 
@@ -388,10 +389,10 @@ public class Main extends Application {
         }
     }
 
-    public char arduinoSensor() {
+    public void arduinoSensor() {
         // Tegen spam wanneer je gewonnen hebt (game over bent) zonder arduino
         if (!arduinoConnected) {
-            return 0;
+            return;
         }
         try {
             while (sp.getInputStream().available() > 0) {
@@ -399,29 +400,23 @@ public class Main extends Application {
                 char lezing = (char) bytes[0];
                 if (lezing == 'B') {
                     knop_B = true;
-                    return lezing;
                 } else if (lezing == 'b') {
                     knop_B = false;
                     magneetMagVeranderen = true;
-                    return lezing;
                 } else if (lezing == 'A') {
                     knop_A = true;
-                    return lezing;
                 } else if (lezing == 'a') {
                     knop_A = false;
                     magneetBinnenHalen();
-                    return lezing;
                 } else {
                     int getal = lezing - 48;
                     magneet.setXMotion((getal - 4.5) / 4.5 * 2);
-                    return lezing;
                 }
             }
         } catch (NullPointerException | IOException ignored) {
         } catch (NumberFormatException NFE) {
             System.out.println("gemiste getal");
         }
-        return 0;
     }
 
 

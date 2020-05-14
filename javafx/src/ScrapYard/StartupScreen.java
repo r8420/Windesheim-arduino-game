@@ -42,8 +42,6 @@ public class StartupScreen extends Application {
     private Boolean doosRaaktMagneet = false;
     private Boolean loslaten = false;
     private Boolean Begin = true;
-    private boolean knop_B;
-    private boolean knop_A;
     private static SerialPort sp;
     private boolean arduinoConnected;
     public static Stage stage;
@@ -54,24 +52,22 @@ public class StartupScreen extends Application {
     PhysicsObject doos = new PhysicsObject(50, HEIGHT - 30, 80, 30);
 
 
-    public static void startStartupScherm(){
-        stage.show();
-    }
-
     @Override
     public void start(Stage stage) {
         this.stage = stage;
 
         arduinoConnected = arduinoStart();
         // achtergrond muziekje
-        try {
-            String musicFile = "src/Music/backgroundMudsic.mp3";
-            Media sound = new Media(new File(musicFile).toURI().toString());
-            mediaPlayer = new MediaPlayer(sound);
-            mediaPlayer.setAutoPlay(true);
-        } catch (Exception mediafout) {
-            System.out.println("Achtergrond muziek kan niet afgespeeld worden");
-        }
+
+        // goh hoe kan het nou dat de muziek het ineens niet doet, hoe zou dat nou komem?
+//        try {
+//            String musicFile = "src/Music/backgroundMusic.mp3";
+//            Media sound = new Media(new File(musicFile).toURI().toString());
+//            mediaPlayer = new MediaPlayer(sound);
+//            mediaPlayer.setAutoPlay(true);
+//        } catch (Exception mediafout) {
+//            System.out.println("Achtergrond muziek kan niet afgespeeld worden");
+//        }
 
         Canvas canvas = new Canvas(WIDTH, HEIGHT);
         GraphicsContext gc = canvas.getGraphicsContext2D();
@@ -206,6 +202,7 @@ public class StartupScreen extends Application {
     }
 
     // de magneet en doos weer op begin plek zetten
+
     private void resetLevel() {
         doos.setX(40);
         doos.setY(HEIGHT - 30);
@@ -217,7 +214,6 @@ public class StartupScreen extends Application {
         magneet.setXMotion(0);
         magneet.setAan(false);
     }
-
 
     public boolean arduinoStart() {
         sp = SerialPort.getCommPort("COM3");
@@ -264,6 +260,10 @@ public class StartupScreen extends Application {
         } catch (NumberFormatException NFE) {
             System.out.println("gemiste getal");
         }
+    }
+
+    public static void showStartupScherm(){
+        stage.show();
     }
 
     public static void main(String[] args) {
