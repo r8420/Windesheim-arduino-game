@@ -100,7 +100,7 @@ public class Main extends Application {
 
         EventHandler<MouseEvent> eventHandler2 = mouseEvent -> {
             StartupScreen startupScreen = new StartupScreen();
-            startupScreen.start(new Stage());
+            StartupScreen.startStartupScherm();
             primaryStage.close();
         };
         newgameText.addEventHandler(MouseEvent.MOUSE_CLICKED, eventHandler);
@@ -160,8 +160,7 @@ public class Main extends Application {
             }
             if (arduinoSensor() == 'B') {
                 sp.closePort();
-                StartupScreen startupScreen = new StartupScreen();
-                startupScreen.start(new Stage());
+                StartupScreen.startStartupScherm();
                 primaryStage.close();
             }
 

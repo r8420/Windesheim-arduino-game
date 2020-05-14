@@ -46,13 +46,17 @@ public class StartupScreen extends Application {
     private boolean knop_A;
     private static SerialPort sp;
     private boolean arduinoConnected;
-    private Stage stage;
+    public static Stage stage;
 
 
     // magneet en doos
     Magneet magneet;
     PhysicsObject doos = new PhysicsObject(50, HEIGHT - 30, 80, 30);
 
+
+    public static void startStartupScherm(){
+        stage.show();
+    }
 
     @Override
     public void start(Stage stage) {
@@ -61,12 +65,12 @@ public class StartupScreen extends Application {
         arduinoConnected = arduinoStart();
         // achtergrond muziekje
         try {
-            String musicFile = "src/Music/backgroundMusic.mp3";
+            String musicFile = "src/Music/backgroundMudsic.mp3";
             Media sound = new Media(new File(musicFile).toURI().toString());
             mediaPlayer = new MediaPlayer(sound);
             mediaPlayer.setAutoPlay(true);
         } catch (Exception mediafout) {
-            System.out.println("ging wat fout");
+            System.out.println("Achtergrond muziek kan niet afgespeeld worden");
         }
 
         Canvas canvas = new Canvas(WIDTH, HEIGHT);
@@ -97,14 +101,19 @@ public class StartupScreen extends Application {
         // event handler knoppen
         EventHandler<MouseEvent> eventHandler = mouseEvent -> {
             Main main = new Main();
+            // stop intro muziek
             try {
                 mediaPlayer.stop();
+            } catch (Exception e) {
+                System.out.println("Geen muziek");
+            }
+            // start game
+            try {
                 main.start(new Stage());
                 stage.close();
             } catch (Exception e) {
                 e.printStackTrace();
             }
-
         };
         EventHandler<MouseEvent> eventHandler2 = mouseEvent -> System.exit(0);
         newgame.addEventHandler(MouseEvent.MOUSE_CLICKED, eventHandler);
@@ -238,7 +247,7 @@ public class StartupScreen extends Application {
                         Main main = new Main();
                         mediaPlayer.stop();
                         main.start(new Stage());
-                        stage.close();
+                        stage.hide();
 
 
                     } catch (Exception e) {
