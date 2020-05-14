@@ -34,7 +34,7 @@ public class Main extends Application {
     private static final double Y_UP_SPEED = 5;
     private static final double Y_DOWN_SPEED = 2;
     private static final double START_HOOGTE = 30;
-    private static final Rectangle BAK = new Rectangle(WIDTH-110, HEIGHT-110, 110, 110);
+    private static final Rectangle BAK = new Rectangle(WIDTH - 110, HEIGHT - 110, 110, 110);
 
     private boolean magneetMagVeranderen = true;
     private boolean magneetBinnenHalen;
@@ -57,16 +57,17 @@ public class Main extends Application {
 
     private Pane pane;
     private Text newgameText;
-    private int huidigePotStand;
-    private Object BigInteger;
+
+    private boolean arduinoConnected;
 
 
     @Override
-    public void start(Stage primaryStage) throws Exception{
+    public void start(Stage primaryStage) throws Exception {
 
 //        Parent root = FXMLLoader.load(getClass().getResource("sample.fxml"));
 //        primaryStage.setScene(new Scene(root, 300, 275));
-        arduinoStart();
+
+        arduinoConnected = arduinoStart();
         primaryStage.setTitle("ScrapYard");
         primaryStage.setResizable(false);
 
@@ -88,7 +89,7 @@ public class Main extends Application {
 
         // startinstellingen voor scherminhoud
         dozen = new ArrayList<>();
-        magneet = new Magneet(WIDTH/2, START_HOOGTE);
+        magneet = new Magneet(WIDTH / 2, START_HOOGTE);
 
 
         resetLevel();
@@ -96,8 +97,8 @@ public class Main extends Application {
         // start de timeline
         Timeline tl = new Timeline(new KeyFrame(Duration.millis(10), e -> {
             gamelogic();
+            if (arduinoConnected) arduinoSensor();
             draw(gc);
-            arduinoSensor();
         }));
         tl.setCycleCount(Timeline.INDEFINITE);
         tl.play();
@@ -112,11 +113,11 @@ public class Main extends Application {
 
     private void resetLevel() {
         dozen.clear();
-        dozen.add(new PhysicsObject(randomWaarde(0,WIDTH-200), HEIGHT/2, randomWaarde(25,100), randomWaarde(25,100)));
+        dozen.add(new PhysicsObject(randomWaarde(0, WIDTH - 200), HEIGHT / 2, randomWaarde(25, 100), randomWaarde(25, 100)));
 //        dozen.add(new Doos(randomWaarde(0,WIDTH-200), HEIGHT/2, randomWaarde(25,100), randomWaarde(25,100)));
 //        dozen.add(new Doos(randomWaarde(0,WIDTH-200), HEIGHT/2, randomWaarde(25,100), randomWaarde(25,100)));
 
-        magneet.setX(WIDTH/2-magneet.getWidth()/2);
+        magneet.setX(WIDTH / 2 - magneet.getWidth() / 2);
         magneet.setY(START_HOOGTE);
         magneet.setYMotion(0);
         magneet.setXMotion(0);
@@ -147,13 +148,13 @@ public class Main extends Application {
             magneetBinnenHalen = false;
 
         } else if (opgepakteDoos == null) {
-            if (magneet.getY() > HEIGHT-magneet.getHeight()) { // collision onderrand
+            if (magneet.getY() > HEIGHT - magneet.getHeight()) { // collision onderrand
                 magneet.setY(HEIGHT - magneet.getHeight());
                 magneetBinnenHalen();
             }
         } else {
-            if (magneet.getY() > HEIGHT-magneet.getHeight()-opgepakteDoos.getHeight()) { // collision onderrand
-                magneet.setY(HEIGHT - magneet.getHeight()-opgepakteDoos.getHeight());
+            if (magneet.getY() > HEIGHT - magneet.getHeight() - opgepakteDoos.getHeight()) { // collision onderrand
+                magneet.setY(HEIGHT - magneet.getHeight() - opgepakteDoos.getHeight());
                 magneetBinnenHalen();
             }
         }
@@ -189,8 +190,8 @@ public class Main extends Application {
         }
 
         if (opgepakteDoos != null) {
-            opgepakteDoos.setX(magneet.getX() + magneet.getWidth() / 2 - opgepakteDoos.getWidth()/2);
-            opgepakteDoos.setY(magneet.getY() + magneet.getHeight()*0.9);
+            opgepakteDoos.setX(magneet.getX() + magneet.getWidth() / 2 - opgepakteDoos.getWidth() / 2);
+            opgepakteDoos.setY(magneet.getY() + magneet.getHeight() * 0.9);
         }
 
 
@@ -234,28 +235,28 @@ public class Main extends Application {
 
         // ketting
         gc.setFill(Color.GRAY);
-        gc.fillRect(magneet.getX()+magneet.getWidth()/2-5, 0, 10, magneet.getY());
+        gc.fillRect(magneet.getX() + magneet.getWidth() / 2 - 5, 0, 10, magneet.getY());
         magneet.draw(gc);
 
         gc.setFill(Color.DARKGRAY);
-        gc.fillRect(BAK.getX(),BAK.getY(),BAK.getWidth(),BAK.getHeight());
+        gc.fillRect(BAK.getX(), BAK.getY(), BAK.getWidth(), BAK.getHeight());
 
         if (victory) {
-            gc.setFill(new Color(1, 1,1, 0.5));
+            gc.setFill(new Color(1, 1, 1, 0.5));
             gc.fillRect(0, 0, WIDTH, HEIGHT);
             newgameText.setFill(Color.GREEN);
             newgameText.setFont(new Font("Arial", 20));
             newgameText.setText("(A) new game");
             gc.setFill(Color.GREEN);
-            gc.setFont(new Font("Arial",50));
-            gc.fillText("Victory",WIDTH/2-75,300);
+            gc.setFont(new Font("Arial", 50));
+            gc.fillText("Victory", WIDTH / 2 - 75, 300);
 
         }
     }
 
     private void drukToetsIn(int toets) {
 //        System.out.println(toets);
-        switch(toets) {
+        switch (toets) {
             case 65: // a
                 links = true;
                 break;
@@ -272,7 +273,7 @@ public class Main extends Application {
     }
 
     private void laatToetsLos(int toets) {
-        switch(toets) {
+        switch (toets) {
             case 65: // a
                 links = false;
                 break;
@@ -296,10 +297,11 @@ public class Main extends Application {
     }
 
 
-    private double randomWaarde(double min, double max){
-        return (Math.random()*((max-min)+1))+min;
+    private double randomWaarde(double min, double max) {
+        return (Math.random() * ((max - min) + 1)) + min;
     }
-    public boolean arduinoStart() throws InterruptedException {
+
+    public boolean arduinoStart() {
         sp = SerialPort.getCommPort("COM3");
         sp.setComPortParameters(9600, 8, 1, 0);
         sp.setComPortTimeouts(SerialPort.TIMEOUT_NONBLOCKING, 0, 0);
@@ -313,35 +315,36 @@ public class Main extends Application {
             return false;
         }
     }
+
     public void arduinoSensor() {
 
         try {
             while (sp.getInputStream().available() > 0) {
                 byte[] bytes = sp.getInputStream().readNBytes(1);
-                char lezing = (char)bytes[0];
-                if (lezing == 'B'){
+                char lezing = (char) bytes[0];
+                if (lezing == 'B') {
                     knop_B = true;
                     break;
-                }else if (lezing == 'b' ){
+                } else if (lezing == 'b') {
                     knop_B = false;
                     magneetMagVeranderen = true;
                     break;
-                }else if (lezing == 'A'){
+                } else if (lezing == 'A') {
                     knop_A = true;
                     break;
-                }else if (lezing == 'a'){
+                } else if (lezing == 'a') {
                     knop_A = false;
                     magneetBinnenHalen();
                     break;
-                }else {
+                } else {
                     int getal = lezing - 48;
-                    magneet.setXMotion((getal-4.5)/4.5*2);
+                    magneet.setXMotion((getal - 4.5) / 4.5 * 2);
                 }
             }
-        } catch (NullPointerException | IOException NE ) {
+        } catch (NullPointerException | IOException NE) {
             System.out.println("ging wat fout");
 
-        }catch (NumberFormatException NFE){
+        } catch (NumberFormatException NFE) {
             System.out.println("gemiste getal");
         }
     }
