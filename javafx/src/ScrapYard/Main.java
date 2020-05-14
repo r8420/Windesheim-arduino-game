@@ -70,7 +70,7 @@ public class Main extends Application {
 
     @Override
     public void start(Stage primaryStage) throws Exception {
-            this.primaryStage = primaryStage;
+        this.primaryStage = primaryStage;
 //        Parent root = FXMLLoader.load(getClass().getResource("sample.fxml"));
 //        primaryStage.setScene(new Scene(root, 300, 275));
 
@@ -392,7 +392,10 @@ public class Main extends Application {
     }
 
     public char arduinoSensor() {
-
+        // Tegen spam wanneer je gewonnen hebt (game over bent) zonder arduino
+        if (!arduinoConnected){
+            return 0;
+        }
         try {
             while (sp.getInputStream().available() > 0) {
                 byte[] bytes = sp.getInputStream().readNBytes(1);
