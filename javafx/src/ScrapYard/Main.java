@@ -5,12 +5,14 @@ import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.application.Application;
 import javafx.event.EventHandler;
+import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
 import javafx.scene.input.MouseEvent;
 
+import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
@@ -23,9 +25,7 @@ import javafx.util.Duration;
 
 import java.io.File;
 import java.io.IOException;
-import java.math.BigInteger;
 import java.util.ArrayList;
-import java.util.Arrays;
 
 public class Main extends Application {
 
@@ -45,7 +45,6 @@ public class Main extends Application {
     private boolean magneetBinnenHalen;
 
     private boolean victory;
-    private boolean gepauzeerd;
     private boolean gameover;
 
     // controls
@@ -61,15 +60,17 @@ public class Main extends Application {
 
     private Scene scene1;
 
-    private Pane pane;
+    private Group rootPane;
     private Text newgameText;
+    private Text startschermText;
 
     private boolean arduinoConnected;
+    private Stage primaryStage;
 
 
     @Override
     public void start(Stage primaryStage) throws Exception {
-
+            this.primaryStage = primaryStage;
 //        Parent root = FXMLLoader.load(getClass().getResource("sample.fxml"));
 //        primaryStage.setScene(new Scene(root, 300, 275));
 
@@ -81,19 +82,33 @@ public class Main extends Application {
         primaryStage.getIcons().add(image);
 
         Canvas canvas = new Canvas(WIDTH, HEIGHT);
-        pane = new StackPane(canvas);
-        scene1 = new Scene(pane);
+        rootPane = new Group(canvas);
+        scene1 = new Scene(rootPane);
 
         newgameText = new Text();
+        newgameText.setX(WIDTH/2-60);
+        newgameText.setY(350);
+        startschermText = new Text();
+        startschermText.setY(375);
+        startschermText.setX(WIDTH/2-60);
+
         GraphicsContext gc = canvas.getGraphicsContext2D();
-        pane.getChildren().add(newgameText);
+        rootPane.getChildren().addAll(newgameText, startschermText);
         EventHandler<MouseEvent> eventHandler = mouseEvent -> {
             resetLevel();
             victory = false;
             gameover = false;
             newgameText.setText("");
+            startschermText.setText("");
+        };
+
+        EventHandler<MouseEvent> eventHandler2 = mouseEvent -> {
+            StartupScreen startupScreen =  new StartupScreen();
+            startupScreen.start(new Stage());
+            primaryStage.close();
         };
         newgameText.addEventHandler(MouseEvent.MOUSE_CLICKED, eventHandler);
+        startschermText.addEventHandler(MouseEvent.MOUSE_CLICKED, eventHandler2);
 
 
         // startinstellingen voor scherminhoud
@@ -138,7 +153,22 @@ public class Main extends Application {
 
         if (dozen.size() == 0 && opgepakteDoos == null) victory = true;  // winconditie
 
-        if (victory || gepauzeerd || gameover) return;
+        if (victory || gameover) {
+            if(arduinoSensor() == 'A'){
+                resetLevel();
+                victory = false;
+                gameover = false;
+                newgameText.setText("");
+                startschermText.setText("");
+            }
+            if (arduinoSensor() == 'B'){
+                StartupScreen startupScreen =  new StartupScreen();
+                startupScreen.start(new Stage());
+                primaryStage.close();
+            }
+
+            return;
+        }
 
         if (timer <= 0) {  // timer updaten
             gameover = true;
@@ -273,7 +303,10 @@ public class Main extends Application {
             gc.fillRect(0, 0, WIDTH, HEIGHT);
             newgameText.setFill(Color.GREEN);
             newgameText.setFont(new Font("Arial", 20));
-            newgameText.setText("(A) new game");
+            newgameText.setText("(A) New game");
+            startschermText.setFill(Color.GREEN);
+            startschermText.setFont(new Font("Arial", 20));
+            startschermText.setText("(B) Terug naar start");
             gc.setFill(Color.GREEN);
             gc.setFont(new Font("Arial", 50));
             gc.fillText("Victory", WIDTH / 2 - 75, 300);
@@ -284,10 +317,13 @@ public class Main extends Application {
         if (gameover) {
             gc.setFill(new Color(1, 1, 1, 0.5));
             gc.fillRect(0, 0, WIDTH, HEIGHT);
-            newgameText.setFill(Color.GREEN);
+            newgameText.setFill(Color.RED);
             newgameText.setFont(new Font("Arial", 20));
-            newgameText.setText("(A) new game");
-            gc.setFill(Color.GREEN);
+            newgameText.setText("(A) New game");
+            startschermText.setFill(Color.RED);
+            startschermText.setFont(new Font("Arial", 20));
+            startschermText.setText("(B) Terug naar start");
+            gc.setFill(Color.RED);
             gc.setFont(new Font("Arial", 50));
             gc.fillText("Game Over", WIDTH / 2 - 125, 300);
         }
@@ -355,7 +391,7 @@ public class Main extends Application {
         }
     }
 
-    public void arduinoSensor() {
+    public char arduinoSensor() {
 
         try {
             while (sp.getInputStream().available() > 0) {
@@ -363,21 +399,22 @@ public class Main extends Application {
                 char lezing = (char) bytes[0];
                 if (lezing == 'B') {
                     knop_B = true;
-                    break;
+                    return lezing;
                 } else if (lezing == 'b') {
                     knop_B = false;
                     magneetMagVeranderen = true;
-                    break;
+                    return lezing;
                 } else if (lezing == 'A') {
                     knop_A = true;
-                    break;
+                    return lezing;
                 } else if (lezing == 'a') {
                     knop_A = false;
                     magneetBinnenHalen();
-                    break;
+                    return lezing;
                 } else {
                     int getal = lezing - 48;
                     magneet.setXMotion((getal - 4.5) / 4.5 * 2);
+                    return lezing;
                 }
             }
         } catch (NullPointerException | IOException NE) {
@@ -386,6 +423,7 @@ public class Main extends Application {
         } catch (NumberFormatException NFE) {
             System.out.println("gemiste getal");
         }
+        return 0;
     }
 
 
