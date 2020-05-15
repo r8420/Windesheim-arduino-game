@@ -106,7 +106,7 @@ public class StartupScreen extends Application {
             // start game
             try {
                 main.start(new Stage());
-                stage.close();
+                stage.hide();
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -239,13 +239,16 @@ public class StartupScreen extends Application {
                 char lezing = (char) bytes[0];
                 if (lezing == 'A') {
                     try {
+                        mediaPlayer.stop();
+                    } catch (Exception e) {
+                        System.out.println("Geen muziek");
+                    }
+                    try {
                         sp.closePort();
                         Main main = new Main();
-                        mediaPlayer.stop();
+
                         main.start(new Stage());
                         stage.hide();
-
-
                     } catch (Exception e) {
                         e.printStackTrace();
                     }

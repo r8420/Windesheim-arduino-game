@@ -380,7 +380,7 @@ public class Main extends Application {
         sp.setComPortTimeouts(SerialPort.TIMEOUT_NONBLOCKING, 0, 0);
 
         if (sp.openPort()) {
-            System.out.println("Succesfully connected to Arduino");
+            System.out.println("Successfully connected to Arduino");
             return true;
 
         } else {
