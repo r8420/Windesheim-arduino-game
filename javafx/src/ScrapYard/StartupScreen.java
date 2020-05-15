@@ -38,7 +38,7 @@ public class StartupScreen extends Application {
     private Text newgame = new Text("Spelen");
     private Text leaveGame = new Text("Leave game");
     private Text title = new Text("ScrapYard");
-    private MediaPlayer mediaPlayer;
+    private static MediaPlayer mediaPlayer;
     private Boolean doosRaaktMagneet = false;
     private Boolean loslaten = false;
     private Boolean Begin = true;
@@ -59,15 +59,14 @@ public class StartupScreen extends Application {
         arduinoConnected = arduinoStart();
         // achtergrond muziekje
 
-        // goh hoe kan het nou dat de muziek het ineens niet doet, hoe zou dat nou komem?
-//        try {
-//            String musicFile = "src/Music/backgroundMusic.mp3";
-//            Media sound = new Media(new File(musicFile).toURI().toString());
-//            mediaPlayer = new MediaPlayer(sound);
-//            mediaPlayer.setAutoPlay(true);
-//        } catch (Exception mediafout) {
-//            System.out.println("Achtergrond muziek kan niet afgespeeld worden");
-//        }
+        try {
+            String musicFile = "src/Music/backgroundMusic.mp3";
+            Media sound = new Media(new File(musicFile).toURI().toString());
+            mediaPlayer = new MediaPlayer(sound);
+            mediaPlayer.setAutoPlay(true);
+        } catch (Exception mediafout) {
+            System.out.println("Achtergrond muziek kan niet afgespeeld worden");
+        }
 
         Canvas canvas = new Canvas(WIDTH, HEIGHT);
         GraphicsContext gc = canvas.getGraphicsContext2D();
@@ -267,6 +266,7 @@ public class StartupScreen extends Application {
 
     public static void showStartupScherm(){
         stage.show();
+        mediaPlayer.play();
     }
 
     public static void main(String[] args) {
