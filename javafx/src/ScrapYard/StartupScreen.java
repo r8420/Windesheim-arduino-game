@@ -39,7 +39,7 @@ public class StartupScreen extends Application {
     private Text leaveGame = new Text("Leave game");
     private Text title = new Text("ScrapYard");
     private static MediaPlayer mediaPlayer;
-    private Boolean doosRaaktMagneet = false;
+    private Boolean autoRaaktMagneet = false;
     private Boolean loslaten = false;
     private Boolean Begin = true;
     private static SerialPort sp;
@@ -47,9 +47,9 @@ public class StartupScreen extends Application {
     public static Stage stage;
 
 
-    // magneet en doos
+    // magneet en auto
     Magneet magneet;
-    PhysicsObject doos = new PhysicsObject(50, HEIGHT - 30, 80, 30);
+    PhysicsObject auto = new PhysicsObject(50, HEIGHT - 30, 80, 30);
 
 
     @Override
@@ -154,37 +154,37 @@ public class StartupScreen extends Application {
                 magneet.setY(magneet.getY() + 1);
             } else {
                 magneet.setAan(true);
-                doosRaaktMagneet = true;
+                autoRaaktMagneet = true;
                 Begin = false;
             }
 
             // fase 2 van animatie
-        } else if (doosRaaktMagneet) {
+        } else if (autoRaaktMagneet) {
             if (magneet.getY() < HEIGHT - 120 && magneet.getY() > 100) {
                 magneet.setY(magneet.getY() - 1);
             } else if (magneet.getX() < 500) {
                 magneet.setX(magneet.getX() + 1);
             } else {
-                doosRaaktMagneet = false;
+                autoRaaktMagneet = false;
                 loslaten = true;
             }
-            doos.setX(magneet.getX() + 10);
-            doos.setY(magneet.getY() + 95);
+            auto.setX(magneet.getX() + 10);
+            auto.setY(magneet.getY() + 95);
 
             // fase 3 van animatie
         } else if (loslaten) {
             magneet.setAan(false);
-            doos.setY(doos.getY() + 1);
+            auto.setY(auto.getY() + 1);
         }
 
-        if (doos.getX() > 500 && doos.getY() > 600) {
+        if (auto.getX() > 500 && auto.getY() > 600) {
             loslaten = false;
             Begin = true;
             resetLevel();
         }
 
-        // doos
-        doos.draw(gc);
+        // auto
+        auto.draw(gc);
 
         // ketting
         gc.setFill(Color.GRAY);
@@ -200,13 +200,13 @@ public class StartupScreen extends Application {
 
     }
 
-    // de magneet en doos weer op begin plek zetten
+    // de magneet en auto weer op begin plek zetten
 
     private void resetLevel() {
-        doos.setX(40);
-        doos.setY(HEIGHT - 30);
-        doos.setYMotion(0);
-        doos.setXMotion(0);
+        auto.setX(40);
+        auto.setY(HEIGHT - 30);
+        auto.setYMotion(0);
+        auto.setXMotion(0);
         magneet.setX(WIDTH / 2 - magneet.getWidth() / 2);
         magneet.setY(STARTHOOGTE);
         magneet.setYMotion(0);

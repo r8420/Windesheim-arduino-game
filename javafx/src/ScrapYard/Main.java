@@ -51,8 +51,8 @@ public class Main extends Application {
     private boolean rechts;
 
     Magneet magneet;
-    PhysicsObject opgepakteDoos;
-    ArrayList<PhysicsObject> dozen;
+    PhysicsObject opgepakteAuto;
+    ArrayList<PhysicsObject> auto;
 
     private static SerialPort sp;
 
@@ -107,7 +107,7 @@ public class Main extends Application {
 
 
         // startinstellingen voor scherminhoud
-        dozen = new ArrayList<>();
+        auto = new ArrayList<>();
         magneet = new Magneet(WIDTH / 2, START_HOOGTE);
 
 
@@ -131,11 +131,12 @@ public class Main extends Application {
     }
 
     private void resetLevel() {
-        opgepakteDoos = null;
-        dozen.clear();
-        dozen.add(new PhysicsObject(randomWaarde(0, WIDTH - 200), HEIGHT / 2, randomWaarde(25, 100), randomWaarde(25, 100)));
-//        dozen.add(new Doos(randomWaarde(0,WIDTH-200), HEIGHT/2, randomWaarde(25,100), randomWaarde(25,100)));
-//        dozen.add(new Doos(randomWaarde(0,WIDTH-200), HEIGHT/2, randomWaarde(25,100), randomWaarde(25,100)));
+        opgepakteAuto = null;
+        auto.clear();
+        auto.add(new PhysicsObject(randomWaarde(0, WIDTH - 200), HEIGHT / 2, randomWaarde(25, 100), randomWaarde(25, 100)));
+//        auto.add(new PhysicsObject(randomWaarde(0, WIDTH - 200), HEIGHT / 2, randomWaarde(25, 100), randomWaarde(25, 100)));
+//        auto.add(new PhysicsObject(randomWaarde(0, WIDTH - 200), HEIGHT / 2, randomWaarde(25, 100), randomWaarde(25, 100)));
+
 
         magneet.setX(WIDTH / 2 - magneet.getWidth() / 2);
         magneet.setY(START_HOOGTE);
@@ -149,7 +150,7 @@ public class Main extends Application {
 
         arduinoSensor();
 
-        if (dozen.size() == 0 && opgepakteDoos == null) victory = true;  // winconditie
+        if (auto.size() == 0 && opgepakteAuto == null) victory = true;  // winconditie
 
         if (victory || gameover) {
             if (knop_A) {
@@ -191,7 +192,7 @@ public class Main extends Application {
             magneet.setY(START_HOOGTE);
             magneetBinnenHalen = false;
 
-        } else if (opgepakteDoos == null) {
+        } else if (opgepakteAuto == null) {
 
             if (magneet.getY() > HEIGHT - magneet.getHeight()) {  // collision onderrand
 
@@ -200,26 +201,26 @@ public class Main extends Application {
             }
         } else {
 
-            if (magneet.getY() > HEIGHT - magneet.getHeight() - opgepakteDoos.getHeight()) {  // collision onderrand
+            if (magneet.getY() > HEIGHT - magneet.getHeight() - opgepakteAuto.getHeight()) {  // collision onderrand
 
-                magneet.setY(HEIGHT - magneet.getHeight() - opgepakteDoos.getHeight());
+                magneet.setY(HEIGHT - magneet.getHeight() - opgepakteAuto.getHeight());
                 magneetBinnenHalen();
             }
         }
 
         int i = 0;
-        int pakDezeDoos = -1;
-        int doosInBak = -1;
-        for (PhysicsObject d : dozen) {
+        int pakDezeAuto = -1;
+        int autoInBak = -1;
+        for (PhysicsObject d : auto) {
             d.updatePos(WIDTH, HEIGHT);
 
 
             if (d.getX() > BAK.getX() && d.getY() > BAK.getY()) {
-                doosInBak = i;
+                autoInBak = i;
             }
 
-            if (magneet.isAan() && opgepakteDoos == null && d.intersects(magneet)) {
-                pakDezeDoos = i;
+            if (magneet.isAan() && opgepakteAuto == null && d.intersects(magneet)) {
+                pakDezeAuto = i;
 
             }
 
@@ -227,19 +228,19 @@ public class Main extends Application {
             i++;
         }
 
-        if (doosInBak != -1) dozen.remove(doosInBak);
+        if (autoInBak != -1) auto.remove(autoInBak);
 
-        if (pakDezeDoos != -1) {
+        if (pakDezeAuto != -1) {
             magneetBinnenHalen = true;
-            opgepakteDoos = dozen.get(pakDezeDoos);
-            opgepakteDoos.setXMotion(0);
-            opgepakteDoos.setYMotion(0);
-            dozen.remove(pakDezeDoos);
+            opgepakteAuto = auto.get(pakDezeAuto);
+            opgepakteAuto.setXMotion(0);
+            opgepakteAuto.setYMotion(0);
+            auto.remove(pakDezeAuto);
         }
 
-        if (opgepakteDoos != null) {
-            opgepakteDoos.setX(magneet.getX() + magneet.getWidth() / 2 - opgepakteDoos.getWidth() / 2);
-            opgepakteDoos.setY(magneet.getY() + magneet.getHeight() * 0.9);
+        if (opgepakteAuto != null) {
+            opgepakteAuto.setX(magneet.getX() + magneet.getWidth() / 2 - opgepakteAuto.getWidth() / 2);
+            opgepakteAuto.setY(magneet.getY() + magneet.getHeight() * 0.9);
         }
 
 
@@ -253,11 +254,11 @@ public class Main extends Application {
         if (knop_B && magneetMagVeranderen) {
             magneetMagVeranderen = false;
 
-            if (magneet.isAan() && opgepakteDoos != null) {  // wanneer je een object laat vallen
-                opgepakteDoos.setXMotion(magneet.getXMotion());
-                opgepakteDoos.setYMotion(magneet.getYMotion());
-                dozen.add(opgepakteDoos);
-                opgepakteDoos = null;
+            if (magneet.isAan() && opgepakteAuto != null) {  // wanneer je een object laat vallen
+                opgepakteAuto.setXMotion(magneet.getXMotion());
+                opgepakteAuto.setYMotion(magneet.getYMotion());
+                auto.add(opgepakteAuto);
+                opgepakteAuto = null;
             }
 
             magneet.setAan(!magneet.isAan()); // switch magneet status;
@@ -275,9 +276,9 @@ public class Main extends Application {
         gc.setFill(Color.WHITE);
         gc.fillRect(0, 0, WIDTH, HEIGHT);
 
-        if (opgepakteDoos != null) opgepakteDoos.draw(gc);
+        if (opgepakteAuto != null) opgepakteAuto.draw(gc);
 
-        for (PhysicsObject d : dozen) {
+        for (PhysicsObject d : auto) {
             d.draw(gc);
         }
 
