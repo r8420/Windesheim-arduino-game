@@ -52,7 +52,7 @@ public class Main extends Application {
 
     Magneet magneet;
     PhysicsObject opgepakteAuto;
-    ArrayList<PhysicsObject> auto;
+    ArrayList<PhysicsObject> autos;
 
     private static SerialPort sp;
 
@@ -107,7 +107,7 @@ public class Main extends Application {
 
 
         // startinstellingen voor scherminhoud
-        auto = new ArrayList<>();
+        autos = new ArrayList<>();
         magneet = new Magneet(WIDTH / 2, START_HOOGTE);
 
 
@@ -132,8 +132,8 @@ public class Main extends Application {
 
     private void resetLevel() {
         opgepakteAuto = null;
-        auto.clear();
-        auto.add(new PhysicsObject(randomWaarde(0, WIDTH - 200), HEIGHT / 2, randomWaarde(25, 100), randomWaarde(25, 100)));
+        autos.clear();
+        autos.add(new PhysicsObject(randomWaarde(0, WIDTH - 200), HEIGHT / 2, randomWaarde(25, 100), randomWaarde(25, 100)));
 //        auto.add(new PhysicsObject(randomWaarde(0, WIDTH - 200), HEIGHT / 2, randomWaarde(25, 100), randomWaarde(25, 100)));
 //        auto.add(new PhysicsObject(randomWaarde(0, WIDTH - 200), HEIGHT / 2, randomWaarde(25, 100), randomWaarde(25, 100)));
 
@@ -150,7 +150,7 @@ public class Main extends Application {
 
         arduinoSensor();
 
-        if (auto.size() == 0 && opgepakteAuto == null) victory = true;  // winconditie
+        if (autos.size() == 0 && opgepakteAuto == null) victory = true;  // winconditie
 
         if (victory || gameover) {
             if (knop_A) {
@@ -211,7 +211,7 @@ public class Main extends Application {
         int i = 0;
         int pakDezeAuto = -1;
         int autoInBak = -1;
-        for (PhysicsObject d : auto) {
+        for (PhysicsObject d : autos) {
             d.updatePos(WIDTH, HEIGHT);
 
 
@@ -228,14 +228,14 @@ public class Main extends Application {
             i++;
         }
 
-        if (autoInBak != -1) auto.remove(autoInBak);
+        if (autoInBak != -1) autos.remove(autoInBak);
 
         if (pakDezeAuto != -1) {
             magneetBinnenHalen = true;
-            opgepakteAuto = auto.get(pakDezeAuto);
+            opgepakteAuto = autos.get(pakDezeAuto);
             opgepakteAuto.setXMotion(0);
             opgepakteAuto.setYMotion(0);
-            auto.remove(pakDezeAuto);
+            autos.remove(pakDezeAuto);
         }
 
         if (opgepakteAuto != null) {
@@ -257,7 +257,7 @@ public class Main extends Application {
             if (magneet.isAan() && opgepakteAuto != null) {  // wanneer je een object laat vallen
                 opgepakteAuto.setXMotion(magneet.getXMotion());
                 opgepakteAuto.setYMotion(magneet.getYMotion());
-                auto.add(opgepakteAuto);
+                autos.add(opgepakteAuto);
                 opgepakteAuto = null;
             }
 
@@ -278,7 +278,7 @@ public class Main extends Application {
 
         if (opgepakteAuto != null) opgepakteAuto.draw(gc);
 
-        for (PhysicsObject d : auto) {
+        for (PhysicsObject d : autos) {
             d.draw(gc);
         }
 
