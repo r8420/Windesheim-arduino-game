@@ -43,7 +43,7 @@ public class StartupScreen extends Application {
     private Boolean loslaten = false;
     private Boolean Begin = true;
     private static SerialPort sp;
-    private boolean arduinoConnected;
+    public static boolean arduinoConnected;
     public static Stage stage;
 
 
