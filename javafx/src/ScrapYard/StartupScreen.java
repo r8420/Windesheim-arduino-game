@@ -58,7 +58,7 @@ public class StartupScreen extends Application {
     @Override
     public void start(Stage stage) {
         this.stage = stage;
-
+        stage.setResizable(false);
         arduinoConnected = arduinoStart();
         // achtergrond muziekje
 
@@ -101,8 +101,6 @@ public class StartupScreen extends Application {
             if(main == null){
                 main = new Main();
                 main.start(new Stage());
-            } else {
-                main.showMainScherm();
             }
             // stop intro muziek
             try {
@@ -112,7 +110,7 @@ public class StartupScreen extends Application {
             }
             // start game
             try {
-                main.start(new Stage());
+                main.showMainScherm();
                 stage.hide();
                 arduinoConnected = false;
             } catch (Exception e) {
