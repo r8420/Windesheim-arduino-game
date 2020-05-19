@@ -408,7 +408,6 @@ public class Main extends Application {
             while (StartupScreen.sp.getInputStream().available() > 0) {
                 byte[] bytes = StartupScreen.sp.getInputStream().readNBytes(1);
                 char lezing = (char) bytes[0];
-                System.out.println(lezing);
                 if (lezing == 'B') {
                     knop_B = true;
                 } else if (lezing == 'b') {

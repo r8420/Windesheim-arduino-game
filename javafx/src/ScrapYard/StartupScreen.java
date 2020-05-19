@@ -240,7 +240,6 @@ public class StartupScreen extends Application {
         // Tegen spam wanneer je gewonnen hebt (game over bent) zonder arduino
         if (!arduinoConnected) return;
         try {
-            System.out.println("Arduino");
             while (sp.getInputStream().available() > 0) {
                 byte[] bytes = sp.getInputStream().readNBytes(1);
                 char lezing = (char) bytes[0];
