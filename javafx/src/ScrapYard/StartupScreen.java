@@ -42,9 +42,12 @@ public class StartupScreen extends Application {
     private Boolean doosRaaktMagneet = false;
     private Boolean loslaten = false;
     private Boolean Begin = true;
-    private static SerialPort sp;
-    private boolean arduinoConnected;
+    public static SerialPort sp;
+    private static boolean arduinoConnected;
     public static Stage stage;
+    private Boolean enableInput = true;
+
+    private Main main;
 
 
     // magneet en doos
@@ -95,7 +98,12 @@ public class StartupScreen extends Application {
 
         // event handler knoppen
         EventHandler<MouseEvent> eventHandler = mouseEvent -> {
-            Main main = new Main();
+            if(main == null){
+                main = new Main();
+                main.start(new Stage());
+            } else {
+                main.showMainScherm();
+            }
             // stop intro muziek
             try {
                 mediaPlayer.stop();
@@ -106,6 +114,7 @@ public class StartupScreen extends Application {
             try {
                 main.start(new Stage());
                 stage.hide();
+                arduinoConnected = false;
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -214,7 +223,7 @@ public class StartupScreen extends Application {
         magneet.setAan(false);
     }
 
-    public boolean arduinoStart() {
+    public static boolean arduinoStart() {
         sp = SerialPort.getCommPort("COM3");
         sp.setComPortParameters(9600, 8, 1, 0);
         sp.setComPortTimeouts(SerialPort.TIMEOUT_NONBLOCKING, 0, 0);
@@ -233,6 +242,7 @@ public class StartupScreen extends Application {
         // Tegen spam wanneer je gewonnen hebt (game over bent) zonder arduino
         if (!arduinoConnected) return;
         try {
+            System.out.println("Arduino");
             while (sp.getInputStream().available() > 0) {
                 byte[] bytes = sp.getInputStream().readNBytes(1);
                 char lezing = (char) bytes[0];
@@ -243,11 +253,21 @@ public class StartupScreen extends Application {
                         System.out.println("Geen muziek");
                     }
                     try {
-                        sp.closePort();
-                        Main main = new Main();
+//                        sp.closePort();
 
-                        main.start(new Stage());
+                        if(main == null){
+                            main = new Main();
+                            main.start(new Stage());
+                        } else {
+                            main.showMainScherm();
+                        }
+
+
+
+
                         stage.hide();
+                        Main.setArduinoConnected(true);
+                        arduinoConnected = false;
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
@@ -266,7 +286,13 @@ public class StartupScreen extends Application {
 
     public static void showStartupScherm(){
         stage.show();
+        Main.setArduinoConnected(true);
         mediaPlayer.play();
+    }
+
+    public static void setArduinoConnected(Boolean arduinoConnected) {
+        StartupScreen.arduinoConnected = arduinoConnected;
+
     }
 
     public static void main(String[] args) {

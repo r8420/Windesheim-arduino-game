@@ -54,14 +54,14 @@ public class Main extends Application {
     PhysicsObject opgepakteDoos;
     ArrayList<PhysicsObject> dozen;
 
-    private static SerialPort sp;
+    //private static SerialPort sp;
 
     private Text newgameText;
     private Text startschermText;
 
 
-    private boolean arduinoConnected;
-    private Stage primaryStage;
+    private static boolean arduinoConnected;
+    private static Stage primaryStage;
 
 
     @Override
@@ -70,7 +70,7 @@ public class Main extends Application {
 //        Parent root = FXMLLoader.load(getClass().getResource("sample.fxml"));
 //        primaryStage.setScene(new Scene(root, 300, 275));
 
-        arduinoConnected = arduinoStart();
+        arduinoConnected = true;
         primaryStage.setTitle("ScrapYard");
         primaryStage.setResizable(false);
         File file = new File("images/magneet_uit.png");
@@ -100,7 +100,10 @@ public class Main extends Application {
 
         EventHandler<MouseEvent> eventHandler2 = mouseEvent -> {
             StartupScreen.showStartupScherm();
-            primaryStage.close();
+            StartupScreen.setArduinoConnected(true);
+            arduinoConnected = false;
+            primaryStage.hide();
+            resetLevel();
         };
         newgameText.addEventHandler(MouseEvent.MOUSE_CLICKED, eventHandler);
         startschermText.addEventHandler(MouseEvent.MOUSE_CLICKED, eventHandler2);
@@ -131,6 +134,10 @@ public class Main extends Application {
     }
 
     private void resetLevel() {
+        victory= false;
+        gameover = false;
+        newgameText.setText("");
+        startschermText.setText("");
         opgepakteDoos = null;
         dozen.clear();
         dozen.add(new PhysicsObject(randomWaarde(0, WIDTH - 200), HEIGHT / 2, randomWaarde(25, 100), randomWaarde(25, 100)));
@@ -161,9 +168,12 @@ public class Main extends Application {
             }
             if (knop_B) {
                 knop_B = false;
-                sp.closePort();
+                //StartupScreen.sp.closePort();
                 StartupScreen.showStartupScherm();
-                primaryStage.close();
+                StartupScreen.setArduinoConnected(true);
+                arduinoConnected = false;
+                primaryStage.hide();
+                resetLevel();
             }
             return;
         }
@@ -375,11 +385,11 @@ public class Main extends Application {
     }
 
     public boolean arduinoStart() {
-        sp = SerialPort.getCommPort("COM3");
-        sp.setComPortParameters(9600, 8, 1, 0);
-        sp.setComPortTimeouts(SerialPort.TIMEOUT_NONBLOCKING, 0, 0);
+        StartupScreen.sp = SerialPort.getCommPort("COM3");
+        StartupScreen.sp.setComPortParameters(9600, 8, 1, 0);
+        StartupScreen.sp.setComPortTimeouts(SerialPort.TIMEOUT_NONBLOCKING, 0, 0);
 
-        if (sp.openPort()) {
+        if (StartupScreen.sp.openPort()) {
             System.out.println("Successfully connected to Arduino");
             return true;
 
@@ -395,9 +405,10 @@ public class Main extends Application {
             return;
         }
         try {
-            while (sp.getInputStream().available() > 0) {
-                byte[] bytes = sp.getInputStream().readNBytes(1);
+            while (StartupScreen.sp.getInputStream().available() > 0) {
+                byte[] bytes = StartupScreen.sp.getInputStream().readNBytes(1);
                 char lezing = (char) bytes[0];
+                System.out.println(lezing);
                 if (lezing == 'B') {
                     knop_B = true;
                 } else if (lezing == 'b') {
@@ -419,6 +430,14 @@ public class Main extends Application {
         }
     }
 
+    public static void showMainScherm(){
+        primaryStage.show();
+        arduinoConnected = true;
+    }
+
+    public static void setArduinoConnected(boolean arduinoConnected) {
+        Main.arduinoConnected = arduinoConnected;
+    }
 
     public static void main(String[] args) {
         launch(args);
