@@ -60,6 +60,7 @@ public class Main extends Application {
     private Text startschermText;
 
 
+    private boolean arduinoConnected;
     private Stage primaryStage;
 
 
@@ -69,7 +70,7 @@ public class Main extends Application {
 //        Parent root = FXMLLoader.load(getClass().getResource("sample.fxml"));
 //        primaryStage.setScene(new Scene(root, 300, 275));
 
-        //arduinoConnected = StartupScreen.arduinoConnected;
+        arduinoConnected = arduinoStart();
         primaryStage.setTitle("ScrapYard");
         primaryStage.setResizable(false);
         File file = new File("images/magneet_uit.png");
@@ -115,7 +116,7 @@ public class Main extends Application {
         // start de timeline
         Timeline tl = new Timeline(new KeyFrame(Duration.millis(10), e -> {
             gamelogic();
-            if (StartupScreen.arduinoConnected) arduinoSensor();
+            if (arduinoConnected) arduinoSensor();
             draw(gc);
         }));
         tl.setCycleCount(Timeline.INDEFINITE);
@@ -390,7 +391,7 @@ public class Main extends Application {
 
     public void arduinoSensor() {
         // Tegen spam wanneer je gewonnen hebt (game over bent) zonder arduino
-        if (!StartupScreen.arduinoConnected) {
+        if (!arduinoConnected) {
             return;
         }
         try {
