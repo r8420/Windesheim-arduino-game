@@ -23,6 +23,9 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 
+/**
+ * The Main screen.
+ */
 public class Main extends Application {
 
     private static final double WIDTH = 600;
@@ -377,7 +380,7 @@ public class Main extends Application {
         return (Math.random() * ((max - min) + 1)) + min;
     }
 
-    public void arduinoSensor() {
+    private void arduinoSensor() {
         // Tegen spam wanneer je gewonnen hebt (game over bent) zonder arduino
         if (!arduinoConnected) {
             return;
@@ -407,6 +410,9 @@ public class Main extends Application {
         }
     }
 
+    /**
+     * Shows main screen.
+     */
     public static void showMainScherm() {
         // zet controls uit op startup screen
         StartupScreen.setArduinoConnected(false);
@@ -415,6 +421,11 @@ public class Main extends Application {
         arduinoConnected = true;
     }
 
+    /**
+     * Sets arduino connected variable.
+     *
+     * @param arduinoConnected the arduino connected
+     */
     public static void setArduinoConnected(boolean arduinoConnected) {
         Main.arduinoConnected = arduinoConnected;
     }

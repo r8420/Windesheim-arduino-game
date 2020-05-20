@@ -29,11 +29,14 @@ import java.io.File;
 import java.io.IOException;
 
 
+/**
+ * The Startup screen.
+ */
 public class StartupScreen extends Application {
 
     private static final double WIDTH = 600;
     private static final double HEIGHT = 700;
-    private final static int STARTHOOGTE = 30;
+    private static final int STARTHOOGTE = 30;
     private static final Rectangle BAK = new Rectangle(WIDTH - 110, HEIGHT - 110, 110, 110);
     private final Text newgame = new Text("Spelen");
     private final Text leaveGame = new Text("Leave game");
@@ -41,18 +44,22 @@ public class StartupScreen extends Application {
     private static MediaPlayer mediaPlayer;
     private Boolean autoRaaktMagneet = false;
     private Boolean loslaten = false;
-    private Boolean Begin = true;
+    private Boolean begin = true;
+    /**
+     * The SerialPort constant sp.
+     */
     public static SerialPort sp;
     private static boolean arduinoConnected;
+    /**
+     * The constant stage.
+     */
     public static Stage stage;
     private static String comPort = "COM3";
 
     private Main main;
 
-
-    // magneet en auto
-    Magneet magneet;
-    final PhysicsObject auto = new PhysicsObject(50, HEIGHT - 30, 80, 30);
+    private Magneet magneet;
+    private final PhysicsObject auto = new PhysicsObject(50, HEIGHT - 30, 80, 30);
 
 
     @Override
@@ -158,7 +165,7 @@ public class StartupScreen extends Application {
         gc.fillRect(0, 0, WIDTH, HEIGHT);
 
         //fase 1 van animatie
-        if (Begin) {
+        if (begin) {
             if (magneet.getX() > 40) {
                 magneet.setX(magneet.getX() - 1);
             } else if (magneet.getY() < HEIGHT - 125) {
@@ -166,7 +173,7 @@ public class StartupScreen extends Application {
             } else {
                 magneet.setAan(true);
                 autoRaaktMagneet = true;
-                Begin = false;
+                begin = false;
             }
 
             // fase 2 van animatie
@@ -190,7 +197,7 @@ public class StartupScreen extends Application {
 
         if (auto.getX() > 500 && auto.getY() > 600) {
             loslaten = false;
-            Begin = true;
+            begin = true;
             resetLevel();
         }
 
@@ -225,6 +232,11 @@ public class StartupScreen extends Application {
         magneet.setAan(false);
     }
 
+    /**
+     * Starts connection with Arduino
+     *
+     * @return boolean true if successful
+     */
     public static boolean arduinoStart() {
         for (SerialPort comm : SerialPort.getCommPorts()) {
             if (comm.getDescriptivePortName().contains("Arduino") || comm.getDescriptivePortName().contains("USB")) {
@@ -251,6 +263,7 @@ public class StartupScreen extends Application {
     private static void serialFlush() {
         try {
             while (sp.getInputStream().available() > 0) {
+                //noinspection ResultOfMethodCallIgnored
                 sp.getInputStream().read();
             }
         } catch (IOException e) {
@@ -258,6 +271,9 @@ public class StartupScreen extends Application {
         }
     }
 
+    /**
+     * Reads arduino input.
+     */
     public void arduinoSensor() {
         // Tegen spam wanneer je gewonnen hebt (game over bent) zonder arduino
         if (!arduinoConnected) return;
@@ -297,6 +313,9 @@ public class StartupScreen extends Application {
         }
     }
 
+    /**
+     * Shows startup screen.
+     */
     public static void showStartupScherm() {
         // zet controls uit in game
         Main.setArduinoConnected(false);
@@ -306,11 +325,21 @@ public class StartupScreen extends Application {
         mediaPlayer.play();
     }
 
+    /**
+     * Sets arduino connected variable.
+     *
+     * @param arduinoConnected the arduino connected
+     */
     public static void setArduinoConnected(Boolean arduinoConnected) {
         StartupScreen.arduinoConnected = arduinoConnected;
 
     }
 
+    /**
+     * The entry point of application.
+     *
+     * @param args the input arguments
+     */
     public static void main(String[] args) {
         launch(args);
     }
