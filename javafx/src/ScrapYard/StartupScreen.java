@@ -98,7 +98,7 @@ public class StartupScreen extends Application {
 
         // event handler knoppen
         EventHandler<MouseEvent> eventHandler = mouseEvent -> {
-            if(main == null){
+            if (main == null) {
                 main = new Main();
                 main.start(new Stage());
             }
@@ -252,14 +252,12 @@ public class StartupScreen extends Application {
                     try {
 //                        sp.closePort();
 
-                        if(main == null){
+                        if (main == null) {
                             main = new Main();
                             main.start(new Stage());
                         } else {
                             main.showMainScherm();
                         }
-
-
 
 
                         stage.hide();
@@ -281,7 +279,7 @@ public class StartupScreen extends Application {
         }
     }
 
-    public static void showStartupScherm(){
+    public static void showStartupScherm() {
         stage.show();
         Main.setArduinoConnected(true);
         mediaPlayer.play();

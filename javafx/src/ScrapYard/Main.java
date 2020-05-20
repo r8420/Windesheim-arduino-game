@@ -134,15 +134,15 @@ public class Main extends Application {
     }
 
     private void resetLevel() {
-        victory= false;
+        victory = false;
         gameover = false;
         newgameText.setText("");
         startschermText.setText("");
         opgepakteAuto = null;
         autos.clear();
         autos.add(new PhysicsObject(randomWaarde(0, WIDTH - 200), HEIGHT / 2, randomWaarde(25, 100), randomWaarde(25, 100)));
-//        dozen.add(new Doos(randomWaarde(0,WIDTH-200), HEIGHT/2, randomWaarde(25,100), randomWaarde(25,100)));
-//        dozen.add(new Doos(randomWaarde(0,WIDTH-200), HEIGHT/2, randomWaarde(25,100), randomWaarde(25,100)));
+//        autos.add(new PhysicsObject(randomWaarde(0, WIDTH - 200), HEIGHT / 2, randomWaarde(25, 100), randomWaarde(25, 100)));
+//        autos.add(new PhysicsObject(randomWaarde(0, WIDTH - 200), HEIGHT / 2, randomWaarde(25, 100), randomWaarde(25, 100)));
 
 
         magneet.setX(WIDTH / 2 - magneet.getWidth() / 2);
@@ -430,7 +430,7 @@ public class Main extends Application {
         }
     }
 
-    public static void showMainScherm(){
+    public static void showMainScherm() {
         primaryStage.show();
         arduinoConnected = true;
     }
