@@ -45,7 +45,7 @@ public class StartupScreen extends Application {
     public static SerialPort sp;
     private static boolean arduinoConnected;
     public static Stage stage;
-    private static String comPort = "COM4";
+    private static String comPort;
 
     private Main main;
 
@@ -138,6 +138,7 @@ public class StartupScreen extends Application {
 
         //Adding scene to the stage
         stage.setScene(scene);
+
         Timeline tl = new Timeline(new KeyFrame(Duration.millis(10), e -> {
             if (arduinoConnected) arduinoSensor();
             draw(gc);
@@ -225,6 +226,11 @@ public class StartupScreen extends Application {
     }
 
     public static boolean arduinoStart() {
+        for (SerialPort comm : SerialPort.getCommPorts()) {
+            if (comm.getDescriptivePortName().contains("Arduino")) {
+                comPort = comm.getSystemPortName();
+            }
+        }
         sp = SerialPort.getCommPort(comPort);
         sp.setComPortParameters(9600, 8, 1, 0);
         sp.setComPortTimeouts(SerialPort.TIMEOUT_NONBLOCKING, 0, 0);
