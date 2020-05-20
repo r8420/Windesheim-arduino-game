@@ -35,9 +35,9 @@ public class StartupScreen extends Application {
     private static final double HEIGHT = 700;
     private final static int STARTHOOGTE = 30;
     private static final Rectangle BAK = new Rectangle(WIDTH - 110, HEIGHT - 110, 110, 110);
-    private Text newgame = new Text("Spelen");
-    private Text leaveGame = new Text("Leave game");
-    private Text title = new Text("ScrapYard");
+    private final Text newgame = new Text("Spelen");
+    private final Text leaveGame = new Text("Leave game");
+    private final Text title = new Text("ScrapYard");
     private static MediaPlayer mediaPlayer;
     private Boolean autoRaaktMagneet = false;
     private Boolean loslaten = false;
@@ -52,12 +52,12 @@ public class StartupScreen extends Application {
 
     // magneet en auto
     Magneet magneet;
-    PhysicsObject auto = new PhysicsObject(50, HEIGHT - 30, 80, 30);
+    final PhysicsObject auto = new PhysicsObject(50, HEIGHT - 30, 80, 30);
 
 
     @Override
     public void start(Stage stage) {
-        this.stage = stage;
+        StartupScreen.stage = stage;
         stage.setResizable(false);
         arduinoConnected = arduinoStart();
         // achtergrond muziekje
@@ -111,7 +111,7 @@ public class StartupScreen extends Application {
             }
             // start game
             try {
-                main.showMainScherm();
+                Main.showMainScherm();
                 stage.hide();
             } catch (Exception e) {
                 e.printStackTrace();
@@ -277,7 +277,7 @@ public class StartupScreen extends Application {
                             main = new Main();
                             main.start(new Stage());
                         }
-                        main.showMainScherm();
+                        Main.showMainScherm();
 
                         stage.hide();
                     } catch (Exception e) {

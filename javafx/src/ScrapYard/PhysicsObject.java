@@ -8,9 +8,9 @@ import java.io.FileNotFoundException;
 
 public class PhysicsObject extends Hitbox {
 
-    private static double zwaartekracht = 0.05;
-    private static double maxValSnelheid = 8;
-    private static double wrijvingsWeerstand = 0.05;
+    private static final double zwaartekracht = 0.05;
+    private static final double maxValSnelheid = 8;
+    private static final double wrijvingsWeerstand = 0.05;
 
     private double xMotion;
     private double yMotion;
