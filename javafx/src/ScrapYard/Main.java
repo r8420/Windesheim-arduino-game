@@ -98,10 +98,9 @@ public class Main extends Application {
             startschermText.setText("");
         };
 
+        // als er met de muis op 'terug naar start' wordt geklikt.
         EventHandler<MouseEvent> eventHandler2 = mouseEvent -> {
             StartupScreen.showStartupScherm();
-            StartupScreen.setArduinoConnected(true);
-            arduinoConnected = false;
             primaryStage.hide();
             resetLevel();
         };
@@ -134,18 +133,18 @@ public class Main extends Application {
     }
 
     private void resetLevel() {
-        victory= false;
+        victory = false;
         gameover = false;
         newgameText.setText("");
         startschermText.setText("");
         opgepakteAuto = null;
         autos.clear();
         autos.add(new PhysicsObject(randomWaarde(0, WIDTH - 200), HEIGHT / 2, randomWaarde(25, 100), randomWaarde(25, 100)));
-//        dozen.add(new Doos(randomWaarde(0,WIDTH-200), HEIGHT/2, randomWaarde(25,100), randomWaarde(25,100)));
-//        dozen.add(new Doos(randomWaarde(0,WIDTH-200), HEIGHT/2, randomWaarde(25,100), randomWaarde(25,100)));
 
-
-        magneet.setX(WIDTH / 2 - magneet.getWidth() / 2);
+        // Bij de eerste start de magneet in het midden zetten
+        if (magneet.getX() == 300.0) {
+            magneet.setX(WIDTH / 2 - magneet.getWidth() / 2);
+        }
         magneet.setY(START_HOOGTE);
         magneet.setYMotion(0);
         magneet.setXMotion(0);
@@ -169,10 +168,7 @@ public class Main extends Application {
             }
             if (knop_B) {
                 knop_B = false;
-                //StartupScreen.sp.closePort();
                 StartupScreen.showStartupScherm();
-                StartupScreen.setArduinoConnected(true);
-                arduinoConnected = false;
                 primaryStage.hide();
                 resetLevel();
             }
@@ -430,8 +426,11 @@ public class Main extends Application {
         }
     }
 
-    public static void showMainScherm(){
+    public static void showMainScherm() {
+        // zet controls uit op startup screen
+        StartupScreen.setArduinoConnected(false);
         primaryStage.show();
+        // zet controls aan in game
         arduinoConnected = true;
     }
 

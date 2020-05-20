@@ -98,7 +98,8 @@ public class StartupScreen extends Application {
 
         // event handler knoppen
         EventHandler<MouseEvent> eventHandler = mouseEvent -> {
-            if(main == null){
+            // maak voor de eerste keer van het staren van de game het main object aan.
+            if (main == null) {
                 main = new Main();
                 main.start(new Stage());
             }
@@ -112,12 +113,14 @@ public class StartupScreen extends Application {
             try {
                 main.showMainScherm();
                 stage.hide();
-                arduinoConnected = false;
             } catch (Exception e) {
                 e.printStackTrace();
             }
         };
-        EventHandler<MouseEvent> eventHandler2 = mouseEvent -> System.exit(0);
+        EventHandler<MouseEvent> eventHandler2 = mouseEvent -> {
+            sp.closePort();
+            System.exit(0);
+        };
         newgame.addEventHandler(MouseEvent.MOUSE_CLICKED, eventHandler);
         leaveGame.addEventHandler(MouseEvent.MOUSE_CLICKED, eventHandler2);
 
@@ -222,7 +225,7 @@ public class StartupScreen extends Application {
     }
 
     public static boolean arduinoStart() {
-        sp = SerialPort.getCommPort("COM3");
+        sp = SerialPort.getCommPort("COM4");
         sp.setComPortParameters(9600, 8, 1, 0);
         sp.setComPortTimeouts(SerialPort.TIMEOUT_NONBLOCKING, 0, 0);
 
@@ -250,26 +253,20 @@ public class StartupScreen extends Application {
                         System.out.println("Geen muziek");
                     }
                     try {
-//                        sp.closePort();
-
-                        if(main == null){
+                        // maak voor de eerste keer van het staren van de game het main object aan.
+                        if (main == null) {
                             main = new Main();
                             main.start(new Stage());
-                        } else {
-                            main.showMainScherm();
                         }
-
-
-
+                        main.showMainScherm();
 
                         stage.hide();
-                        Main.setArduinoConnected(true);
-                        arduinoConnected = false;
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
                 }
-                if (lezing == 'B') {
+                if (lezing == 'B' && arduinoConnected) {
+                    sp.closePort();
                     System.exit(0);
                 }
             }
@@ -281,9 +278,12 @@ public class StartupScreen extends Application {
         }
     }
 
-    public static void showStartupScherm(){
+    public static void showStartupScherm() {
+        // zet controls uit in game
+        Main.setArduinoConnected(false);
         stage.show();
-        Main.setArduinoConnected(true);
+        // zet controls aan op startup screen
+        arduinoConnected = true;
         mediaPlayer.play();
     }
 
