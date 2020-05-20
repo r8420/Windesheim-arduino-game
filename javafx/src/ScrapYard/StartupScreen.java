@@ -227,7 +227,7 @@ public class StartupScreen extends Application {
 
     public static boolean arduinoStart() {
         for (SerialPort comm : SerialPort.getCommPorts()) {
-            if (comm.getDescriptivePortName().contains("Arduino")) {
+            if (comm.getDescriptivePortName().contains("Arduino") || comm.getDescriptivePortName().contains("USB")) {
                 comPort = comm.getSystemPortName();
             }
         }
