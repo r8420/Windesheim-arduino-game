@@ -45,7 +45,7 @@ public class StartupScreen extends Application {
     public static SerialPort sp;
     private static boolean arduinoConnected;
     public static Stage stage;
-    private static String comPort;
+    private static String comPort = "COM3";
 
     private Main main;
 
@@ -236,7 +236,7 @@ public class StartupScreen extends Application {
         sp.setComPortTimeouts(SerialPort.TIMEOUT_NONBLOCKING, 0, 0);
 
         if (sp.openPort()) {
-            System.out.println("Successfully connected to Arduino");
+            System.out.println("Successfully connected to Arduino on: " + comPort);
 
             //Flush serial buffer
             serialFlush();
