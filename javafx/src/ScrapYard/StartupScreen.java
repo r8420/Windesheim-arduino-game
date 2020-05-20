@@ -231,11 +231,24 @@ public class StartupScreen extends Application {
 
         if (sp.openPort()) {
             System.out.println("Successfully connected to Arduino");
+
+            //Flush serial buffer
+            serialFlush();
             return true;
 
         } else {
             System.out.println("Couldn't connect to Arduino");
             return false;
+        }
+    }
+
+    private static void serialFlush() {
+        try {
+            while (sp.getInputStream().available() > 0) {
+                sp.getInputStream().read();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 
