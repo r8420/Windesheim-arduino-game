@@ -1,6 +1,5 @@
 package ScrapYard;
 
-import com.fazecast.jSerialComm.SerialPort;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.application.Application;
@@ -50,11 +49,10 @@ public class Main extends Application {
     private boolean links;
     private boolean rechts;
 
-    Magneet magneet;
-    PhysicsObject opgepakteAuto;
-    ArrayList<PhysicsObject> autos;
+    private Magneet magneet;
+    private PhysicsObject opgepakteAuto;
+    private ArrayList<PhysicsObject> autos;
 
-    //private static SerialPort sp;
 
     private Text newgameText;
     private Text startschermText;
@@ -67,8 +65,6 @@ public class Main extends Application {
     @Override
     public void start(Stage primaryStage) {
         this.primaryStage = primaryStage;
-//        Parent root = FXMLLoader.load(getClass().getResource("sample.fxml"));
-//        primaryStage.setScene(new Scene(root, 300, 275));
 
         arduinoConnected = true;
         primaryStage.setTitle("ScrapYard");
@@ -381,21 +377,6 @@ public class Main extends Application {
         return (Math.random() * ((max - min) + 1)) + min;
     }
 
-    public boolean arduinoStart() {
-        StartupScreen.sp = SerialPort.getCommPort("COM3");
-        StartupScreen.sp.setComPortParameters(9600, 8, 1, 0);
-        StartupScreen.sp.setComPortTimeouts(SerialPort.TIMEOUT_NONBLOCKING, 0, 0);
-
-        if (StartupScreen.sp.openPort()) {
-            System.out.println("Successfully connected to Arduino");
-            return true;
-
-        } else {
-            System.out.println("Couldn't connect to Arduino");
-            return false;
-        }
-    }
-
     public void arduinoSensor() {
         // Tegen spam wanneer je gewonnen hebt (game over bent) zonder arduino
         if (!arduinoConnected) {
@@ -438,8 +419,4 @@ public class Main extends Application {
         Main.arduinoConnected = arduinoConnected;
     }
 
-    public static void main(String[] args) {
-        launch(args);
-
-    }
 }

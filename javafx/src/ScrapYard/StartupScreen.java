@@ -45,7 +45,7 @@ public class StartupScreen extends Application {
     public static SerialPort sp;
     private static boolean arduinoConnected;
     public static Stage stage;
-    private Boolean enableInput = true;
+    private static String comPort = "COM4";
 
     private Main main;
 
@@ -225,7 +225,7 @@ public class StartupScreen extends Application {
     }
 
     public static boolean arduinoStart() {
-        sp = SerialPort.getCommPort("COM4");
+        sp = SerialPort.getCommPort(comPort);
         sp.setComPortParameters(9600, 8, 1, 0);
         sp.setComPortTimeouts(SerialPort.TIMEOUT_NONBLOCKING, 0, 0);
 
