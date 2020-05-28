@@ -23,9 +23,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 
-/**
- * The Main screen.
- */
 public class Main extends Application {
 
     private static final double WIDTH = 600;
@@ -420,11 +417,6 @@ public class Main extends Application {
         arduinoConnected = true;
     }
 
-    /**
-     * Sets arduino connected variable.
-     *
-     * @param arduinoConnected the arduino connected
-     */
     public static void setArduinoConnected(boolean arduinoConnected) {
         Main.arduinoConnected = arduinoConnected;
     }

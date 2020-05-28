@@ -28,10 +28,6 @@ import javafx.util.Duration;
 import java.io.File;
 import java.io.IOException;
 
-
-/**
- * The Startup screen.
- */
 public class StartupScreen extends Application {
 
     private static final double WIDTH = 600;
@@ -45,14 +41,10 @@ public class StartupScreen extends Application {
     private Boolean autoRaaktMagneet = false;
     private Boolean loslaten = false;
     private Boolean begin = true;
-    /**
-     * The SerialPort constant sp.
-     */
+
     public static SerialPort sp;
     private static boolean arduinoConnected;
-    /**
-     * The constant stage.
-     */
+
     public static Stage stage;
     private static String comPort = "COM3";
 
@@ -232,11 +224,6 @@ public class StartupScreen extends Application {
         magneet.setAan(false);
     }
 
-    /**
-     * Starts connection with Arduino
-     *
-     * @return boolean true if successful
-     */
     public static boolean arduinoStart() {
         for (SerialPort comm : SerialPort.getCommPorts()) {
             if (comm.getDescriptivePortName().contains("Arduino") || comm.getDescriptivePortName().contains("USB")) {
@@ -271,9 +258,6 @@ public class StartupScreen extends Application {
         }
     }
 
-    /**
-     * Reads arduino input.
-     */
     public void arduinoSensor() {
         // Tegen spam wanneer je gewonnen hebt (game over bent) zonder arduino
         if (!arduinoConnected) return;
@@ -313,10 +297,7 @@ public class StartupScreen extends Application {
         }
     }
 
-    /**
-     * Shows startup screen.
-     */
-    public static void showStartupScherm() {
+    static void showStartupScherm() {
         // zet controls uit in game
         Main.setArduinoConnected(false);
         stage.show();
@@ -325,21 +306,11 @@ public class StartupScreen extends Application {
         mediaPlayer.play();
     }
 
-    /**
-     * Sets arduino connected variable.
-     *
-     * @param arduinoConnected the arduino connected
-     */
     public static void setArduinoConnected(Boolean arduinoConnected) {
         StartupScreen.arduinoConnected = arduinoConnected;
 
     }
 
-    /**
-     * The entry point of application.
-     *
-     * @param args the input arguments
-     */
     public static void main(String[] args) {
         launch(args);
     }
