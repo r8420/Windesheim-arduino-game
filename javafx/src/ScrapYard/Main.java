@@ -216,7 +216,6 @@ public class Main extends Application {
         for (PhysicsObject d : autos) {
             d.updatePos(WIDTH, HEIGHT);
 
-
             if (d.getX() > BAK.getX() && d.getY() > BAK.getY()) {
                 autoInBak = i;
             }
